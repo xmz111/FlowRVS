@@ -11,13 +11,16 @@
 
 <p align="center">
   <img src="assets/begin_01.jpg" alt="Result" style="width:92%;">
+  <figcaption style="text-align: center; margin-top: 10px; font-size: 0.95em;">
+            <strong>FlowRVS</strong> replaces the cascaded ‘locate-then-segment’ paradigm (A) with a unified, end-to-end flow (B). This new paradigm avoids information bottlenecks, enabling superior handling of complex language and dynamic video (C) and achieving state-of-the-art performance (D).
+        </figcaption>
 </p>
 
-**DiffusionNFT** is a new online reinforcement learning paradigm for diffusion models that performs policy optimization directly on the **forward diffusion process**.
+**✨ Key Features:**
 
--   **Solver-Agnostic:** Unlike GRPO, DiffusionNFT is compatible with any black-box sampler (e.g., high-order ODE solvers) throughout data collection.
--   **Theoretically Consistent & Memory Efficient:** By operating on the forward process, DiffusionNFT maintains forward consistency and only requires clean images for training, instead of the entire sampling trajectories.
--   **Simple & Compatible:** DiffusionNFT is built on the standard flow-matching objective, making it easy to integrate into existing diffusion training codebases.
+-   **FlowRVS** reformulates RVOS as learning a continuous, text-conditioned flow that deforms a video’s spatio-temporal representation into its target mask.
+-   **FlowRVS** successfully  transfer the powerful text-to-video generative model to this RVOS task by proposing a suite of principled techniques.
+-   **FlowRVS** achieves  new state of the art (SOTA) results on key benchmarks
 
 <p align="center">
   <img src="assets/method.jpg" alt="Result" style="width:92%;">
@@ -26,9 +29,9 @@
 
 ## 🔥 News
 
-- __[2025.9.12]__:  🎉 
-- __[2025.9.12]__:  🎉 
-- __[2025.9.8]__:   🎉 
+- __[2025.10.12]__:  🎉 
+- __[2025.10.12]__:  🎉 
+- __[2025.10.8]__:   🎉 
 
 ## 🕒 Open-source Plan
 - [X] 
@@ -60,7 +63,6 @@ We referenced the following works, and appreciate their contributions to the com
 If you find our FlowRVS useful for your research and applications, please kindly cite us:
 ```
 
-}
 ```
 
 
