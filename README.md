@@ -5,8 +5,6 @@
 </div>
 
 
-![head](assets/begin_01.jpg)
-
 
 ## 🏄‍♂️ Overview
 
