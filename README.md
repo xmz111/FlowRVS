@@ -5,7 +5,7 @@
 </div>
 
 
-![head](assets/head.jpg)
+![head](assets/begin_01.jpg)
 
 
 ## 🔥 News
@@ -19,7 +19,7 @@
 - [ ] 
 - [ ] 
 
-## 🛠️ Dependencies and Installation
+## 🛠️ Environment Setup
 
 
 
