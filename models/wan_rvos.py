@@ -57,9 +57,7 @@ def adapt_dit_for_concat_input(transformer: WanTransformer3DModel, video_latent_
 
     if old_in_channels == new_in_channels:
         print("Transformer's input channels already match the R-VOS requirement. No input adaptation needed.")
-        return # Early exit if no change needed
 
-    # Ensure original in_channels matches video_latent_channels for correct weight copying
     if old_in_channels != video_latent_channels:
         print(f"WARNING: Original transformer in_channels ({old_in_channels}) does not match expected video latent channels ({video_latent_channels}). "
               "Weight copying might be incorrect. Please verify your `video_latent_channels` matches the pre-trained transformer's input.")
@@ -74,10 +72,7 @@ def adapt_dit_for_concat_input(transformer: WanTransformer3DModel, video_latent_
     ).to(old_patch_embedding.weight.device, old_patch_embedding.weight.dtype)
 
     with torch.no_grad():
-        # Copy original weights for the video latent channels (assuming they are at the beginning)
-        # Ensure the slice is correct: [:, :old_in_channels, ...]
         new_patch_embedding.weight[:, :old_in_channels, :, :, :].copy_(old_patch_embedding.weight)
-        # Initialize new channels (for mask) with zeros
         new_patch_embedding.weight[:, old_in_channels:, :, :, :].zero_()
         if old_bias:
             if new_patch_embedding.bias.shape[0] < old_patch_embedding.bias.shape[0]:
@@ -92,7 +87,7 @@ def build_dit(args):
     device = torch.device(args.device)
 
     target_dtype = torch.bfloat16
-    model_id = "Wan2.1-T2V-1.3B-Diffusers" # Or your local path
+    model_id = "Wan2.1-T2V-1.3B-Diffusers"
     #model_id = 'wan2.1/Wan2.1-T2V-14B-Diffusers'
     #transformer = WanTransformer3DModel.from_pretrained(model_id, subfolder="transformer", torch_dtype=target_dtype)
         
