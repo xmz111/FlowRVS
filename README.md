@@ -56,8 +56,8 @@
 
 We referenced the following works, and appreciate their contributions to the community.
 
-- [FastVideo](https://github.com/hao-ai-lab/FastVideo)
-- [DanceGRPO](https://github.com/XueZeyue/DanceGRPO)
+- [Wan2.1](https://github.com/Wan-Video/Wan2.1)
+
 
 ## 🔗 BibTeX
 If you find our FlowRVS useful for your research and applications, please kindly cite us:
