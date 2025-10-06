@@ -1,0 +1,15 @@
+torch
+torchvision
+diffusers
+sentencepiece
+transformers
+timm
+tqdm
+requests
+ftfy
+regex
+matplotlib
+einops
+scipy
+pycocotools
+moviepy
