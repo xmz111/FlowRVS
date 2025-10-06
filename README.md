@@ -34,9 +34,8 @@
 - __[2025.10.8]__:   🎉 
 
 ## 🕒 Open-source Plan
-- [X] 
-- [ ] 
-- [ ] 
+- Inference codes are uploaded.
+- Other codes and weight swill come soon.
 
 ## 🛠️ Environment Setup
 ```
