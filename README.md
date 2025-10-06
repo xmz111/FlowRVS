@@ -33,11 +33,24 @@
  - [ ] Training Code and Guidance
 
 ## 🛠️ Environment Setup
+
+#### 1. Create a conda environment
+```
+git clone https://github.com/xmz111/FlowRVS.git && cd FlowRVS
+conda create -n flowrvs python=3.10 -y
+conda activate flowrvs
+```
+#### 2. Install  dependencies
+```
+pip install -r requirements.txt
+```
+
+#### 3. Prepare Wan2.1 T2V model.
 ```
 pip install "huggingface_hub[cli]"
 huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
 ```
-Prepare Wan2.1 T2V model first.
+
 
 
 
