@@ -10,17 +10,15 @@ import torch.nn.functional as F
 from PIL import Image, ImageDraw
 from tqdm import tqdm
 
-# 从您的项目中导入必要的模块
 import opts
 import util.misc as utils
 from models.wan_rvos import build_dit
-from models.wan_rvos_2_2 import build_dit_big
 from models.text import TextProcessor
 from diffusers.models import AutoencoderKLWan
 from diffusers.schedulers import FlowMatchEulerDiscreteScheduler
 from transformers import AutoTokenizer, UMT5EncoderModel
 from models.mask_vae_finetuner import MaskVAEFinetuner
-from datasets.transform_utils import VideoEvalDataset, vis_add_mask_new, check_shape, check_shape_big
+from datasets.transform_utils import VideoEvalDataset, vis_add_mask_new, check_shape
 from utils_inf import colormap
 from torch.utils.data import DataLoader
 from moviepy import ImageSequenceClip
@@ -52,44 +50,28 @@ def extract_frames_from_mp4(video_path, output_folder):
 
 def prepare_models(args):
     device = torch.device(args.device)
-    
-    # 1. 加载主模型 DiT
-    if args.big:
-        model, _, _ = build_dit_big(args)
-    else:
-        model, _, _ = build_dit(args)
 
-    # 2. 加载 VAE 和 Text Encoder
-    model_id = "Wan2.2-TI2V-5B-Diffusers" if args.big else "Wan2.1-T2V-1.3B-Diffusers_download"
+    model = build_dit(args)
+
+    model_id = "Wan2.1-T2V-1.3B-Diffusers"
     vae = AutoencoderKLWan.from_pretrained(model_id, subfolder="vae")
     tokenizer = AutoTokenizer.from_pretrained(model_id, subfolder="tokenizer")
     text_encoder = UMT5EncoderModel.from_pretrained(model_id, subfolder="text_encoder")
     scheduler = FlowMatchEulerDiscreteScheduler.from_config(model_id, subfolder="scheduler")
-    
     text_processor = TextProcessor(tokenizer, text_encoder.to(device).eval())
+    model_id = "Wan2.1-T2V-1.3B-Diffusers" 
     
-    # 3. 加载修改过的 VAE Decoder (Mask Head)
-    model_id = "Wan2.1-T2V-1.3B-Diffusers_download" # Or your local path
-    if args.big:
-        model_id = "Wan2.2-TI2V-5B-Diffusers"
-        
     mask_head = MaskVAEFinetuner(
         args=args,
         vae_model_id=model_id,
-        freeze_encoder=True,
-        modify_type='add_output_head',
         target_dtype=vae.dtype, # Or based on your args setup
-        
     )
-    if args.big:
-        ckpt_path = 'decoder_8_32/checkpoint0016.pth'
-    else:
-        ckpt_path = 'decoder_8_13/checkpoint0002.pth'
+
+    ckpt_path = 'decoder_8_13/checkpoint0002.pth'
     checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
     if 'model' in checkpoint:
         missing_keys, unexpected_keys = mask_head.load_state_dict(checkpoint['model'], strict=False)
-        
-    loaded_mask_output_head = None    
+
     vae.decoder = mask_head.vae.decoder
     
     vae.to(device).eval() 
@@ -110,7 +92,7 @@ def prepare_models(args):
     else:
         raise ValueError('Please specify the checkpoint for inference using --resume.')
     
-    model.to(device).to(torch.bfloat16).eval() # 使用 bfloat16 加速并节约显存
+    model.to(device).to(torch.bfloat16).eval() 
     vae.to(torch.bfloat16)
     text_processor.text_encoder.to(torch.bfloat16)
 
@@ -134,16 +116,10 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
             frame_ext = os.path.splitext(image_files[0])[1]
     else:
         raise ValueError(f"不支持的输入路径格式: {video_path}")
-
-
-    mask_mean = [0.102, 1.785, -0.280, 1.776, -0.626, 0.370, 0.763, 0.196, 1.262, 2.408, -0.378, -1.655, 0.211, 0.138, 1.555, -0.497, -0.782, -0.336, -0.763, 0.303, 0.768, -2.598, -1.233, -0.372, 0.809, 0.269, -0.292, 0.048, -0.483, 0.536, -1.342, 0.157, -0.217, -0.917, 0.931, 0.596, 0.671, -2.088, 0.385, 3.371, -0.127, -1.399, 0.348, -0.107, -0.390, -0.299, -0.583, 0.964] if args.big else [-2.218, -0.402, -3.687, -3.968, 1.125, 0.099, 2.156, 1.351, 5.062, 1.968, -2.921, -2.140, 0.671, 0.859, -3.921, -3.015]
-    mask_std = [0.227, 1.211, 0.524, 1.102, 0.511, 0.291, 0.366, 0.266, 0.745, 1.225, 0.451, 1.184, 0.341, 0.524, 1.087, 0.506, 0.601, 0.325, 0.529, 0.486, 0.443, 1.606, 1.147, 0.396, 0.685, 0.300, 0.228, 0.503, 0.376, 0.344, 0.818, 0.341, 0.174, 0.439, 0.619, 0.452, 0.413, 1.564, 0.526, 2.025, 0.280, 1.190, 0.349, 0.253, 0.379, 0.273, 0.669, 0.636] if args.big else [1.976, 1.046, 2.234, 3.015, 0.839, 1.046, 1.585, 1.101, 3.515, 1.664, 2.281, 1.507, 1.132, 0.878, 3.484, 2.234]
-    
+ 
     device, dtype = vae.device, vae.dtype
     mean_tensor = torch.tensor(vae.config.latents_mean, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
     std_tensor = torch.tensor(vae.config.latents_std, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
-    mean_tensor_mask = torch.tensor(mask_mean, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
-    std_tensor_mask = torch.tensor(mask_std, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
 
     target_h, target_w = (480, 832)
     vd = VideoEvalDataset(frames_folder, frames_list, frame_ext, target_h=target_h, target_w=target_w)
@@ -163,7 +139,7 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
     imgs = imgs.unsqueeze(0)
     
     with torch.no_grad():
-        imgs = check_shape_big(imgs) if args.big else check_shape(imgs)
+        imgs = check_shape(imgs)
         x0_video_latent = vae.encode(imgs.transpose(1, 2).to(vae.dtype)).latent_dist.mean
         x0_video_latent = (x0_video_latent - mean_tensor) / std_tensor
 
@@ -189,7 +165,7 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
                 )[0]
                 latents = scheduler.step(noise_pred, t, latents)[0]
 
-            latents = latents * std_tensor_mask + mean_tensor_mask
+            #latents = latents * std_tensor_mask + mean_tensor_mask
             decoded_pixel_output = vae.decode(latents.detach())[0]
             decoded_pixel_output = F.interpolate(decoded_pixel_output.view(-1, 1, decoded_pixel_output.shape[-2], decoded_pixel_output.shape[-1]),
                                 size=(origin_h, origin_w), mode='bilinear', align_corners=False) 
