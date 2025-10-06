@@ -23,9 +23,7 @@ from utils_inf import colormap
 from torch.utils.data import DataLoader
 from moviepy import ImageSequenceClip
 
-# 视觉化用的颜色列表
 color_list = colormap().astype('uint8').tolist()
-
 
 def extract_frames_from_mp4(video_path, output_folder):
 
@@ -64,7 +62,7 @@ def prepare_models(args):
     mask_head = MaskVAEFinetuner(
         args=args,
         vae_model_id=model_id,
-        target_dtype=vae.dtype, # Or based on your args setup
+        target_dtype=vae.dtype, 
     )
 
     ckpt_path = 'decoder_8_13/checkpoint0002.pth'
@@ -115,7 +113,7 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
             frames_list = sorted([os.path.splitext(f)[0] for f in image_files])
             frame_ext = os.path.splitext(image_files[0])[1]
     else:
-        raise ValueError(f"不支持的输入路径格式: {video_path}")
+        raise ValueError(f"Path is not rigjt: {video_path}")
  
     device, dtype = vae.device, vae.dtype
     mean_tensor = torch.tensor(vae.config.latents_mean, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
