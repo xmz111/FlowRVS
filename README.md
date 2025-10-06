@@ -28,9 +28,9 @@
 
 
 ## 🕒 Open-Source Plan
- - [ ] Model and Inference Code
- - [x] Model Weight and Inference Guidance
- - [x] Training Code and Guidance
+ - [x] Model and Inference Code
+ - [ ] Model Weight and Inference Guidance
+ - [ ] Training Code and Guidance
 
 ## 🛠️ Environment Setup
 ```
