@@ -27,15 +27,10 @@
 </p>
 
 
-## 🔥 News
-
-- __[2025.10.12]__:  🎉 
-- __[2025.10.12]__:  🎉 
-- __[2025.10.8]__:   🎉 
-
-## 🕒 Open-source Plan
-- Inference codes are uploaded.
-- Other codes and weight swill come soon.
+## 🕒 Open-Source Plan
+ - [ ] Model and Inference Code
+ - [x] Model Weight and Inference Guidance
+ - [x] Training Code and Guidance
 
 ## 🛠️ Environment Setup
 ```
