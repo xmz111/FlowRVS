@@ -170,7 +170,6 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
             reconstructed_mask_probs = torch.sigmoid(decoded_pixel_output)
             all_pred_masks = (reconstructed_mask_probs > 0.5).float().cpu().squeeze(0).squeeze(1)
             all_pred_masks = all_pred_masks[:original_len].numpy() 
-
             
             prompt_sanitized = "".join(c if c.isalnum() else "_" for c in prompt)
             
