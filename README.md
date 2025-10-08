@@ -1,7 +1,7 @@
 <div align=“center” style=“font-family: charter;”>
 <h1 align="center"> Deforming Videos to Masks: Flow Matching for Referring Video Segmentation </h1>
 <div align="center">
-  <a href='https://arxiv.org/abs/'><img src='https://img.shields.io/badge/ArXiv-red?logo=arxiv'></a>  &nbsp;
+  <a href='https://arxiv.org/abs/2510.06139'><img src='https://img.shields.io/badge/ArXiv-red?logo=arxiv'></a>  &nbsp;
 </div>
 
 
@@ -73,7 +73,12 @@ We referenced the following works, and appreciate their contributions to the com
 ## 🔗 BibTeX
 If you find our FlowRVS useful for your research and applications, please kindly cite us:
 ```
-
+@article{wang2025flowrvs,
+  title={No Other Representation Component Is Needed: Diffusion Transformers Can Provide Representation Guidance by Themselves},
+  author={Wang, Zanyi and Jiang, Dengyang and Li, Liuzhuozheng and Dang, Sizhe and Li, Chengzu and Yang, Harry and Dai, Guang and Wang, Mengmeng and Wang, Jingdong},
+  journal={arXiv preprint arXiv:2510.06139}, 
+  year={2025}
+}
 ```
 
 
