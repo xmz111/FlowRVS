@@ -42,7 +42,7 @@ class TextProcessor:
     @torch.no_grad() # No need to track gradients for this frozen part
     def get_embeds_and_masks(
         self,
-        prompt_list: List[str], # 接收一个字符串列表
+        prompt_list: List[str], 
         device: torch.device,
         dtype: torch.dtype,
         max_sequence_length: int,
