@@ -1,8 +1,11 @@
 <div align=“center” style=“font-family: charter;”>
 <h1 align="center"> Deforming Videos to Masks: Flow Matching for Referring Video Segmentation </h1>
-<div align="center">
-  <a href='https://arxiv.org/abs/2510.06139'><img src='https://img.shields.io/badge/ArXiv-red?logo=arxiv'></a>  &nbsp;
-</div>
+
+<p align="center">
+  <a href='https://arxiv.org/abs/2510.06139'>
+    <img src="https://img.shields.io/badge/arXiv%20paper-2510.06139-b31b1b.svg" alt="Paper">
+  </a>
+</p>
 
 
 
