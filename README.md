@@ -77,7 +77,7 @@ We referenced the following works, and appreciate their contributions to the com
 If you find our FlowRVS useful for your research and applications, please kindly cite us:
 ```
 @article{wang2025flowrvs,
-  title={No Other Representation Component Is Needed: Diffusion Transformers Can Provide Representation Guidance by Themselves},
+  title={Deforming Videos to Masks: Flow Matching for Referring Video Segmentation},
   author={Wang, Zanyi and Jiang, Dengyang and Li, Liuzhuozheng and Dang, Sizhe and Li, Chengzu and Yang, Harry and Dai, Guang and Wang, Mengmeng and Wang, Jingdong},
   journal={arXiv preprint arXiv:2510.06139}, 
   year={2025}
