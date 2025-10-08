@@ -36,10 +36,6 @@ from pycocotools import mask as cocomask
 color_list = colormap()
 color_list = color_list.astype('uint8').tolist()
 
-
-# (main function and other helper functions like box_cxcywh_to_xyxy, rescale_bboxes,
-# draw_reference_points, draw_sample_points, vis_add_mask are unchanged)
-# ... (rest of your main.py remains the same until sub_processor) ...
 def save_file(cfg_path, script_path):
     with open(script_path, 'r') as file: 
         content = file.read()
@@ -80,10 +76,6 @@ def main(args):
 
     model, vae, text_encoder, loaded_mask_output_head, scheduler = prepare()
 
-    '''
-    if args.cfg:
-        print('do_classifier_free_guidance')
-    '''
     output_dir = args.output_dir
     save_path_prefix = os.path.join(output_dir, 'Annotations')
     os.makedirs(save_path_prefix, exist_ok=True)
@@ -113,11 +105,10 @@ def prepare():
 
     device = torch.device(args.device)
     #device = torch.device('cpu')
-    # 1. Load DiT Model (Main Model)
-    model = build_dit(args)
-    #model.to(device)
 
-    # 2. Load VAE and Text Encoder (Auxiliary Models)
+    model = build_dit(args)
+    model.to(device)
+
     vae, tokenizer, text_encoder, scheduler = load_modeles(device)
     text_processor = TextProcessor(tokenizer, text_encoder)
     
@@ -128,7 +119,7 @@ def prepare():
     for param in text_encoder.parameters():
         param.requires_grad = False # Freeze Text Encoder
 
-    model_id = "Wan2.1-T2V-1.3B-Diffusers" # Or your local path
+    model_id = "Wan2.1-T2V-1.3B-Diffusers" 
         
     mask_head = MaskVAEFinetuner(
         args=args,
@@ -200,8 +191,6 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
     latents_std = torch.tensor(vae.config.latents_std).view(1, vae.config.z_dim, 1, 1, 1)
     mean_tensor = latents_mean.to(device=vae.device, dtype=vae.dtype)
     std_tensor = latents_std.to(device=vae.device, dtype=vae.dtype)
-    
-
     
     # 1. For each video
     for i_v, video in enumerate(video_list):
@@ -349,15 +338,12 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                         mask_rle = gt_data[str(anno_id)][frame_idx]
                         if mask_rle:
                             gt_masks[frame_idx] += cocomask.decode(mask_rle)
-
-                
-                
+             
                 j = db_eval_iou(gt_masks, all_pred_masks).mean()
                 f = db_eval_boundary(gt_masks, all_pred_masks).mean()
                 # print(f'J {j} & F {f}')
                 out_dict[exp] = [j, f]
-                out_dict_per_vid[exp] = [j, f]
-                
+                out_dict_per_vid[exp] = [j, f]      
                 
                 save_path = join(save_path_prefix, video_name, exp_id)
                 os.makedirs(save_path, exist_ok=True)
@@ -427,7 +413,7 @@ def get_current_metrics(out_dict):
     return J_score, F_score, JF
   
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('VDIT inference script', parents=[opts.get_args_parser()])
+    parser = argparse.ArgumentParser('FlowRVS inference script', parents=[opts.get_args_parser()])
     parser.add_argument('--print_freq', default=1, type=int, help="Frequency of logging training status (iterations)")
     parser.add_argument('--save_eval_vis', default=True, action='store_true', help="Evaluate on validation set every N epochs (if eval_during_train is True)")
     parser.add_argument('--num_steps', default=4, type=int, help="Evaluate on validation set every N epochs (if eval_during_train is True)")
