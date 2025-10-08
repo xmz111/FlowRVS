@@ -1,6 +1,3 @@
-"""
-Modified from DETR and SgMg (https://github.com/facebookresearch/detr, https://github.com/bo-miao/SgMg) 
-"""
 import time
 
 import torch
@@ -18,8 +15,6 @@ def _get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # this disables a huggingface tokenizer warning (printed every epoch)
-
-
 
 
 class MLP(nn.Module):
