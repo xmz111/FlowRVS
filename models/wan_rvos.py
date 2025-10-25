@@ -1,3 +1,6 @@
+"""
+Modified from DETR and SgMg (https://github.com/facebookresearch/detr, https://github.com/bo-miao/SgMg) 
+"""
 import time
 
 import torch
@@ -7,7 +10,6 @@ import os
 import copy
 import warnings
 warnings.filterwarnings("ignore")
-from diffusers.models import  WanTransformer3DModel
 from models.transformer import WanTransformer3DModel
 from safetensors.torch import load_file as load_safetensors
 
@@ -15,6 +17,8 @@ def _get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # this disables a huggingface tokenizer warning (printed every epoch)
+
+
 
 
 class MLP(nn.Module):
@@ -41,7 +45,6 @@ def adapt_dit_for_concat_input(transformer: WanTransformer3DModel, video_latent_
     """
     new_in_channels = video_latent_channels + mask_latent_channels
     
-    # --- Adapt Patch Embedding (Input Layer) ---
     old_patch_embedding = transformer.patch_embedding
     old_in_channels = old_patch_embedding.in_channels
     old_out_channels = old_patch_embedding.out_channels
@@ -83,28 +86,20 @@ def build_dit(args):
 
     target_dtype = torch.bfloat16
     model_id = "Wan2.1-T2V-1.3B-Diffusers"
-    #model_id = 'wan2.1/Wan2.1-T2V-14B-Diffusers'
-    #transformer = WanTransformer3DModel.from_pretrained(model_id, subfolder="transformer", torch_dtype=target_dtype)
-        
     config = WanTransformer3DModel.load_config(model_id, subfolder="transformer")
-    #print(f"Loaded config.patch_size: {config.patch_size}")
-    #print(f"Type of config.patch_size: {type(config.patch_size)}")
 
     transformer = WanTransformer3DModel(**config)
     
     weights_path_part1 = os.path.join(model_id, "transformer", "diffusion_pytorch_model-00001-of-00002.safetensors")
     weights_path_part2 = os.path.join(model_id, "transformer", "diffusion_pytorch_model-00002-of-00002.safetensors")
 
-    if not os.path.exists(weights_path_part1) or not os.path.exists(weights_path_part2):
-        raise FileNotFoundError(f"Pre-trained weights not found in {os.path.join(model_id, 'transformer')}. Ensure both parts exist.")
-    '''
     loaded_state_dict_part1 = load_safetensors(weights_path_part1)
     loaded_state_dict_part2 = load_safetensors(weights_path_part2)
 
     transformer.load_state_dict(loaded_state_dict_part1, strict=False)
     transformer.load_state_dict(loaded_state_dict_part2, strict=False)
-    '''
-    #transformer.to(target_dtype)
+    
+    transformer = transformer.to(target_dtype)
     '''
     transformer = WanTransformer3DModel.from_pretrained(
         model_id, 
@@ -112,13 +107,10 @@ def build_dit(args):
         torch_dtype=target_dtype,
     )
     '''
-    print(transformer)
-
     
     transformer.enable_gradient_checkpointing()
-    #transformer.to(device)
+    transformer.to(device)
     video_latent_channels, mask_latent_channels = 16, 16
     adapt_dit_for_concat_input(transformer, video_latent_channels, mask_latent_channels)
-    print(transformer)
     
     return transformer
