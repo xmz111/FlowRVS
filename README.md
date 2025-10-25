@@ -63,14 +63,14 @@ huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T
 Inference on MeViS val and val_u splits.
 1. Prepare data:  
     MeVis/  
-      └── valid/  
-        ├── JPEGImages/  
-        ├── mask_dict.json  
-        └── meta_expressions.json  
-      └── valid_u/  
-        ├── JPEGImages/  
-        ├── mask_dict.json  
-        └── meta_expressions.json  
+        └── valid/  
+          ├── JPEGImages/  
+          ├── mask_dict.json  
+          └── meta_expressions.json  
+        └── valid_u/  
+          ├── JPEGImages/  
+          ├── mask_dict.json  
+          └── meta_expressions.json  
 2. Download DiT and tuned VAE weights and place them as mevis_ckpt.pth and decoder.pth;
 3. ``` python inference_mevis.py --dit_ckpt=mevis_ckpt.pth --vae_ckpt=decoder.pth --output_dir=mevis_eval_new --split=valid_u ```\
    
