@@ -36,36 +36,22 @@ from pycocotools import mask as cocomask
 color_list = colormap()
 color_list = color_list.astype('uint8').tolist()
 
-def save_file(cfg_path, script_path):
-    with open(script_path, 'r') as file: 
-        content = file.read()
-    with open(cfg_path + '/' + script_path.split('/')[-1], 'w') as file: 
-        file.write(content) 
-        print(f"File {script_path} saved.")
-
 def load_modeles(device):
-    target_dtype = torch.bfloat16
     model_id = "Wan2.1-T2V-1.3B-Diffusers" # Or your local path
-    vae = AutoencoderKLWan.from_pretrained(model_id, subfolder="vae", torch_dtype=target_dtype).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_id, subfolder="tokenizer")
-    text_encoder = UMT5EncoderModel.from_pretrained(model_id, subfolder="text_encoder", torch_dtype=target_dtype).to(device)
-    
-    scheduler = FlowMatchEulerDiscreteScheduler.from_config(model_id, subfolder="scheduler") # Or create a new one
-    vae.requires_grad_(False)
-    text_encoder.requires_grad_(False)
-    return vae.eval(), tokenizer, text_encoder.eval(), scheduler
+    text_encoder = UMT5EncoderModel.from_pretrained(model_id, subfolder="text_encoder", torch_dtype=torch.bfloat16).to(device)
+    scheduler = FlowMatchEulerDiscreteScheduler.from_config(model_id, subfolder="scheduler") 
+    return tokenizer, text_encoder, scheduler
 
 def main(args):
-    #args.dataset_file = "davis" #"davis"
     args.masks = True
     args.batch_size == 1
     args.eval = True
-    #utils.init_distributed_mode(args)
+
     print(args)
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    save_file(args.output_dir, 'inference_mevis.py')
     seed = args.seed #+ utils.get_rank()
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -74,7 +60,7 @@ def main(args):
     start_time = time.time()
     print('Start inference')
 
-    model, vae, text_encoder, loaded_mask_output_head, scheduler = prepare()
+    model, vae, text_encoder, scheduler = prepare()
 
     output_dir = args.output_dir
     save_path_prefix = os.path.join(output_dir, 'Annotations')
@@ -84,15 +70,13 @@ def main(args):
         fp.writelines(" ".join(sys.argv)+'\n')
         fp.writelines(str(args.__dict__)+'\n\n')        
 
-    #split = 'valid_u'
-    #args.split = 'valid_u'
     split = args.split
     save_visualize_path_prefix = os.path.join(output_dir, split + '_images')
     if args.visualize:
         os.makedirs(save_visualize_path_prefix, exist_ok=True)
         
     model = model.to(dtype=torch.bfloat16).eval()
-    eval_mevis(args, model, vae, text_encoder, loaded_mask_output_head, scheduler,\
+    eval_mevis(args, model, vae, text_encoder, scheduler,\
         save_path_prefix, save_visualize_path_prefix, split=split)
 
 
@@ -104,52 +88,38 @@ def main(args):
 def prepare():
 
     device = torch.device(args.device)
-    #device = torch.device('cpu')
-
+    # 1. Load DiT Model (Main Model)
     model = build_dit(args)
-    model.to(device)
+    #model.to(device)
 
-    vae, tokenizer, text_encoder, scheduler = load_modeles(device)
+    # 2. Load VAE and Text Encoder (Auxiliary Models)
+    tokenizer, text_encoder, scheduler = load_modeles(device)
     text_processor = TextProcessor(tokenizer, text_encoder)
+
+    model_id = "Wan2.1-T2V-1.3B-Diffusers"   
+    mask_vae = MaskVAEFinetuner(vae_model_id=model_id, target_dtype=torch.bfloat16)
     
-    for param in vae.parameters(): 
-        param.requires_grad = False # Freeze VAE
-    
-    text_encoder.to(device).eval()
-    for param in text_encoder.parameters():
-        param.requires_grad = False # Freeze Text Encoder
+    print(f"[Loading checkpoint from {args.vae_ckpt}]")
+    vae_checkpoint = torch.load(args.vae_ckpt, map_location='cpu', weights_only=False)
+    vae_state_dict = vae_checkpoint.get('model', vae_checkpoint)
+    torch.save(vae_state_dict, 'decoder.pth')
+    missing_keys, unexpected_keys = mask_vae.load_state_dict(vae_state_dict, strict=True)
+    unexpected_keys = [k for k in unexpected_keys if not (k.endswith('total_params') or k.endswith('total_ops'))]
+    if len(missing_keys) > 0:
+        print(f'Missing Keys: {missing_keys}')
+    if len(unexpected_keys) > 0:
+        print(f'Unexpected Keys: {unexpected_keys}')
+    del vae_checkpoint
 
-    model_id = "Wan2.1-T2V-1.3B-Diffusers" 
-        
-    mask_head = MaskVAEFinetuner(
-        args=args,
-        vae_model_id=model_id,
-        freeze_encoder=True,
-        modify_type='add_output_head',
-        target_dtype=vae.dtype, # Or based on your args setup
-        
-    )
+    # now vae is same as WAN VAE, but use tuned weight
+    vae = mask_vae.vae.to(device).eval() 
 
-    ckpt_path = 'decoder_8_13/checkpoint0002.pth'
-    checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
-    if 'model' in checkpoint:
-        missing_keys, unexpected_keys = mask_head.load_state_dict(checkpoint['model'], strict=False)
-        
-    loaded_mask_output_head = None
-    # --- Model Loading and Checkpoint ---
-    model_without_ddp = model # In inference, typically not DDP wrapped
-
-    vae.decoder = mask_head.vae.decoder
-    
-    vae.to(device).eval() 
-
-    if args.resume:
-        print(f"[Loading checkpoint from {args.resume}")
-        checkpoint = torch.load(args.resume, map_location='cpu', weights_only=False)
-        model_state_dict = checkpoint.get('model', checkpoint) # Try 'model' key first, then raw checkpoint
-        
-        missing_keys, unexpected_keys = model_without_ddp.load_state_dict(model_state_dict, strict=False)
-
+    model_without_ddp = model 
+    if args.dit_ckpt:
+        print(f"[Loading checkpoint from {args.dit_ckpt}]")
+        checkpoint = torch.load(args.dit_ckpt, map_location='cpu', weights_only=False)
+        model_state_dict = checkpoint.get('model', checkpoint) 
+        missing_keys, unexpected_keys = model_without_ddp.load_state_dict(model_state_dict, strict=True)
         unexpected_keys = [k for k in unexpected_keys if not (k.endswith('total_params') or k.endswith('total_ops'))]
         if len(missing_keys) > 0:
             print(f'Missing Keys: {missing_keys}')
@@ -157,13 +127,12 @@ def prepare():
             print(f'Unexpected Keys: {unexpected_keys}')
         del checkpoint
     else:
-        raise ValueError('Please specify the checkpoint for inference using --resume.')
+        raise ValueError('Please specify the checkpoint for inference using --dit_ckpt.')
     
-    return model_without_ddp, vae, text_processor, loaded_mask_output_head, scheduler
+    return model_without_ddp, vae, text_processor, scheduler
 
 
-def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_path_prefix, save_visualize_path_prefix, split='valid_u'):
-    # load data
+def eval_mevis(args, model, vae, text_processor, scheduler, save_path_prefix, save_visualize_path_prefix, split='valid_u'):
     root = Path(args.mevis_path)
     img_folder = join(root, split, "JPEGImages")
     meta_file = join(root, split, "meta_expressions.json")
@@ -182,7 +151,7 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
         ncols=0
     )
     f_log_vid = join(args.output_dir, 'log_metrics_byvid.txt')
-    # start inference
+
     f_log = join(args.output_dir, 'log_metrics.txt')
     model.eval()
     out_dict = {}
@@ -208,7 +177,6 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
             meta["frames"] = data[video]["frames"]
             metas.append(meta)
         meta = metas
-
     
         # 2. For each expression
         for i in range(num_expressions):
@@ -220,12 +188,7 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
             video_len = len(original_frames) 
 
             frames = original_frames
-            pad_num = len(frames) - video_len
-            #print(frames)
-            
-            all_pred_masks, all_decisions = [], []
-
-            target_h, target_w = 480, 832
+            target_h, target_w = args.reso_h, args.reso_w
             vd = VideoEvalDataset(join(img_folder, video_name), frames, target_h=target_h, target_w=target_w)
             
             origin_w, origin_h = vd.origin_w, vd.origin_h
@@ -233,7 +196,7 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                     num_workers=args.num_workers, shuffle=False)
             origin_w, origin_h = vd.origin_w, vd.origin_h
             
-            all_pred_masks, all_decisions = [], []
+            all_pred_masks = []
             # 3. for each clip
             for imgs, clip_frames_ids in dl:
                 clip_frames_ids = clip_frames_ids.tolist()
@@ -249,19 +212,13 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                     imgs = torch.cat([imgs, padding_frames], dim=0)
                     
                 imgs = imgs.unsqueeze(0)
-                #print('imgs', imgs.shape) imgs torch.Size([9, 3, 540, 960])
                 with torch.no_grad():
                     imgs = check_shape(imgs)
-                    #print('imgs', imgs.shape)
                     x0_video_latent = vae.encode(imgs.transpose(1, 2).to(vae.dtype)).latent_dist.mean 
-                    #mask_input_flat = mask_input.repeat(1, 3, 1, 1, 1).to(vae.dtype) * 2.0 - 1.0 
-                    #x1_mask_latent_clean = vae.encode(mask_input_flat.to(vae.dtype)).latent_dist.sample()
-                    #print('x0_video_latent', x0_video_latent.shape) # torch.Size([1, 16, 3, 67, 120])
                     prompt_embeds, negative_prompt_embeds = text_processor.encode_prompt_and_cfg(
                         prompt=[exp], 
                         device=args.device,
                         dtype=vae.dtype,
-                        do_classifier_free_guidance=args.cfg,
                     )
                     
                     shift = 3
@@ -269,7 +226,6 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                     timesteps = shift * t_steps / (1 + (shift - 1) * t_steps) * 1000
                     timesteps = timesteps[:-1]
                     timesteps = timesteps.round()
-                    #print(timesteps)
 
                     scheduler.set_timesteps(
                         num_inference_steps=len(timesteps), 
@@ -279,12 +235,8 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                     
                     x0_video_latent = (x0_video_latent - mean_tensor) / std_tensor
                     latents = x0_video_latent
-                    #print(timesteps)
                     for k, t in enumerate(timesteps):
-                        #print(t)
-                        # t = torch.round(t).long()
                         timestep = t.expand(latents.shape[0])
-                        #new_latents = torch.cat((latents, x0_video_latent), dim=1)
                         noise_pred = model(
                             hidden_states=latents.to(model.dtype),
                             video_condition=x0_video_latent.to(model.dtype),
@@ -299,36 +251,16 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
 
                         
                     latents = latents * std_tensor + mean_tensor
-                    flow_matching_latent_mask_prediction = latents
-                    decoded_pixel_output = vae.decode(flow_matching_latent_mask_prediction.detach())[0]
-                    #decoded_pixel_output = pixel_head(decoded_pixel_output) 
-                    '''
-                    decoded_pixel_output = F.interpolate( # Renamed from gt_mask_for_loss for clarity
-                        decoded_pixel_output.view(-1, 1, decoded_pixel_output.shape[-2], decoded_pixel_output.shape[-1]), # Flatten BxT
-                        size=(origin_h, origin_w), # Target size from predicted mask
-                        mode='nearest' # Use nearest for binary masks
-                    )
-                    #print('decoded_pixel_output', decoded_pixel_output.shape)     
-                    '''   
+                    decoded_pixel_output = vae.decode(latents.detach())[0] 
                     decoded_pixel_output = F.interpolate(decoded_pixel_output.view(-1, 1, decoded_pixel_output.shape[-2], decoded_pixel_output.shape[-1]), 
                                 size=(origin_h, origin_w), mode='bilinear', align_corners=False) 
                     reconstructed_mask_probs = torch.sigmoid(decoded_pixel_output)
                     
                     reconstructed_mask_binary = (reconstructed_mask_probs > 0.5).float().squeeze(0).squeeze(1)
-                    #print('reconstructed_mask_binary', reconstructed_mask_binary.shape)
                     all_pred_masks.append(reconstructed_mask_binary.cpu())
 
-
-            # store the video results
-            #all_pred_masks = torch.cat(all_pred_masks, dim=0).numpy()  # (video_len, h, w)
-            #pad_pred_masks = torch.cat(all_pred_masks, dim=0).numpy()
             all_pred_masks = torch.cat(all_pred_masks, dim=0).numpy()[:video_len]
-            #previous_masks = pad_pred_masks[:video_len + pad_num - args.num_frames]
-            #remain_masks = pad_pred_masks[video_len + pad_num - args.num_frames + pad_num:]
-            #all_pred_masks = np.concatenate((previous_masks, remain_masks), axis=0, out=None)
-            
-            #print('all_pred_masks', all_pred_masks.shape)
-            # load GTs
+
             if args.split == 'valid_u' or args.split == 'train':
                 h, w = all_pred_masks.shape[-2:]
                 gt_masks = np.zeros((video_len, h, w), dtype=np.uint8)
@@ -338,12 +270,12 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                         mask_rle = gt_data[str(anno_id)][frame_idx]
                         if mask_rle:
                             gt_masks[frame_idx] += cocomask.decode(mask_rle)
-             
+                
                 j = db_eval_iou(gt_masks, all_pred_masks).mean()
                 f = db_eval_boundary(gt_masks, all_pred_masks).mean()
-                # print(f'J {j} & F {f}')
                 out_dict[exp] = [j, f]
-                out_dict_per_vid[exp] = [j, f]      
+                out_dict_per_vid[exp] = [j, f]
+                
                 
                 save_path = join(save_path_prefix, video_name, exp_id)
                 os.makedirs(save_path, exist_ok=True)
@@ -416,8 +348,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('FlowRVS inference script', parents=[opts.get_args_parser()])
     parser.add_argument('--print_freq', default=1, type=int, help="Frequency of logging training status (iterations)")
     parser.add_argument('--save_eval_vis', default=True, action='store_true', help="Evaluate on validation set every N epochs (if eval_during_train is True)")
-    parser.add_argument('--num_steps', default=4, type=int, help="Evaluate on validation set every N epochs (if eval_during_train is True)")
-    parser.add_argument('--cfg', default=False, action='store_true', help="do_classifier_free_guidance")
+    parser.add_argument('--num_steps', default=1, type=int, help="Evaluate on validation set every N epochs (if eval_during_train is True)")
+    parser.add_argument('--dit_ckpt', default=None, type=str, help="DiT checkpoint")
+    parser.add_argument('--vae_ckpt', default=None, type=str, help="VAE checkpoint for tuned decoder")
+    parser.add_argument('--reso_h', default=480, type=int, help="VAE checkpoint for tuned decoder")
+    parser.add_argument('--reso_w', default=832, type=int, help="VAE checkpoint for tuned decoder")
     args = parser.parse_args()
     main(args)
     print("Save results at: {}.".format(os.path.join(args.output_dir, "DVS_Annotations")))
