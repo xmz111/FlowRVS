@@ -54,9 +54,9 @@ pip install "huggingface_hub[cli]"
 huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
 ```
 
-#### 4. Download DiT and tuned VAE checkpoints on hf.
-
-
+#### 4. Download DiT and tuned VAE checkpoints on hf.  
+https://huggingface.co/xmz111/FlowRVS  
+mevis_dit.pth and tuned_vae.pth
 
 
 
