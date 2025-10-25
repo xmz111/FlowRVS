@@ -48,11 +48,13 @@ conda activate flowrvs
 pip install -r requirements.txt
 ```
 
-#### 3. Prepare Wan2.1 T2V model.
+#### 3. Prepare Wan2.1 T2V model, we need config to construct models and T5 Encoder.
 ```
 pip install "huggingface_hub[cli]"
 huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
 ```
+
+#### 4. Download DiT and tuned VAE checkpoints on hf.
 
 
 
@@ -72,8 +74,8 @@ Inference on MeViS val and val_u splits.
         * JPEGImages/
         * mask_dict.json
         * meta_expressions.json
-3. Download DiT and tuned VAE weights and place them as mevis_ckpt.pth and decoder.pth;
-4. ``` python inference_mevis.py --dit_ckpt=mevis_ckpt.pth --vae_ckpt=decoder.pth --output_dir=mevis_eval_new --split=valid_u ```
+3. Download DiT and tuned VAE weights and place them as mevis_dit.pth and tuned_vae.pth;
+4. ``` python inference_mevis.py --dit_ckpt=mevis_dit.pth --vae_ckpt=tuned_vae.pth --output_dir=mevis_eval_new --split=valid_u ```
    
 This code will cost about 33G GPU memory with default setting.
 
