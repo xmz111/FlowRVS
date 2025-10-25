@@ -72,7 +72,8 @@ MeVis/
     ├── mask_dict.json
     └── meta_expressions.json
 2. Download DiT and tuned VAE weights and place them as mevis_ckpt.pth and decoder.pth;
-3. ``` python inference_mevis.py --dit_ckpt=mevis_ckpt.pth --vae_ckpt=decoder.pth --output_dir=mevis_eval_new --split=valid_u ```
+3. ``` python inference_mevis.py --dit_ckpt=mevis_ckpt.pth --vae_ckpt=decoder.pth --output_dir=mevis_eval_new --split=valid_u ```\
+   
 This code will cost about 33G GPU memory with default setting.
 
 
