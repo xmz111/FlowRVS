@@ -61,8 +61,8 @@ huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T
 
 ## 🍻 Inference
 Inference on MeViS val and val_u splits.
-1. Prepare data: 
-*datasets
+1. Prepare data:  
+* datasets
     * MeViS/
       * valid/
         * JPEGImages/
