@@ -63,7 +63,7 @@ mevis_dit.pth and tuned_vae.pth
 
 ## 🍻 Inference
 Inference on MeViS val and val_u splits.
-1. Prepare data:  
+1. Prepare data: https://github.com/henghuiding/MeViS  
 * datasets
     * MeViS/
       * valid/
