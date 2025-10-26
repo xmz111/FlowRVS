@@ -67,8 +67,7 @@ Inference on MeViS val and val_u splits.
 * datasets
     * MeViS/
       * valid/
-        * JPEGImages/
-        * mask_dict.json
+        * JPEGImages/  
         * meta_expressions.json
       * valid_u/
         * JPEGImages/
