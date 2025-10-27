@@ -54,7 +54,7 @@ class MaskVAEFinetuner(nn.Module):
     """
     A wrapper around Wan VAE for finetuning its decoder to output single-channel masks.
     """
-    def __init__(self, args, vae_model_id, target_dtype=torch.bfloat16):
+    def __init__(self, vae_model_id, target_dtype=torch.bfloat16):
         super().__init__()
         print(f"Loading VAE from {vae_model_id} (subfolder 'vae')...")
         self.vae = AutoencoderKLWan.from_pretrained(vae_model_id, subfolder="vae", torch_dtype=target_dtype)
@@ -63,7 +63,6 @@ class MaskVAEFinetuner(nn.Module):
         original_conv_out = self.vae.decoder.conv_out
         in_channels = original_conv_out.in_channels
         out_dim = in_channels
-
 
         new_conv_out = WanCausalConv3d(
             in_channels=out_dim,
