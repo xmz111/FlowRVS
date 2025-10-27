@@ -276,10 +276,9 @@ def eval_mevis(args, model, vae, text_processor, scheduler, save_path_prefix, sa
                 out_dict[exp] = [j, f]
                 out_dict_per_vid[exp] = [j, f]
                 
-                
+                '''
                 save_path = join(save_path_prefix, video_name, exp_id)
                 os.makedirs(save_path, exist_ok=True)
-                '''
                 for j in range(video_len):
                     frame_name = original_frames[j]
                     mask = all_pred_masks[j].astype(np.float32) 
