@@ -279,13 +279,14 @@ def eval_mevis(args, model, vae, text_processor, scheduler, save_path_prefix, sa
                 
                 save_path = join(save_path_prefix, video_name, exp_id)
                 os.makedirs(save_path, exist_ok=True)
+                '''
                 for j in range(video_len):
                     frame_name = original_frames[j]
                     mask = all_pred_masks[j].astype(np.float32) 
                     mask = Image.fromarray(mask * 255).convert('L')
                     save_file = os.path.join(save_path, frame_name + ".png")
                     mask.save(save_file)
-                    
+                '''
             else:
                 # save binary image
                 save_path = join(save_path_prefix, video_name, exp_id)
