@@ -54,16 +54,13 @@ pip install "huggingface_hub[cli]"
 huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
 ```
 
-#### 4. Download DiT and tuned VAE checkpoints on hf.  
-https://huggingface.co/xmz111/FlowRVS  
-mevis_dit.pth and tuned_vae.pth
-
-
 
 
 ## 🍻 Inference
-Inference on MeViS val and val_u splits.
-1. Prepare data: https://github.com/henghuiding/MeViS  
+### Inference on MeViS val and val_u splits.
+#### 1. Prepare data
+The dataset can be found in: https://github.com/henghuiding/MeViS  
+After you successfully download the dataset, the file structure of the dataset should be like this:
 * datasets
     * MeViS/
       * valid/
@@ -73,10 +70,13 @@ Inference on MeViS val and val_u splits.
         * JPEGImages/
         * mask_dict.json
         * meta_expressions.json
-3. Download DiT and tuned VAE weights and place them as mevis_dit.pth and tuned_vae.pth;
-4. ``` python inference_mevis.py --dit_ckpt=mevis_dit.pth --vae_ckpt=tuned_vae.pth --output_dir=mevis_eval_new --split=valid_u ```
+#### 2. Download DiT and tuned VAE checkpoints from  https://huggingface.co/xmz111/FlowRVS  and place them as mevis_dit.pth and tuned_vae.pth;
+#### 3.  Inference
+Just run:
+
+``` python inference_mevis.py --dit_ckpt=mevis_dit.pth --vae_ckpt=tuned_vae.pth --output_dir=mevis_eval_new --split=valid_u ```
    
-This code will cost about 33G GPU memory with default setting.
+Note that this code will cost about 33G GPU memory with default setting.
 
 
 ## 🥂 Training
