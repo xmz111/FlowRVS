@@ -19,11 +19,6 @@ def get_args_parser():
                         help='Start epoch if resuming training.')
     parser.add_argument('--output_dir', default='output',
                         help='Path where to save checkpoints and logs. Empty for no saving.')
-    parser.add_argument('--set', type=str, default='val',
-                        help="Subset to evaluate ('val' or other subsets)")
-    parser.add_argument('--task', type=str, default='unsupervised',
-                        choices=['semi-supervised', 'unsupervised'],
-                        help="Evaluation task type")
     parser.add_argument('--device', default='cuda',
                         help='Device to use for training / testing (e.g., "cuda", "cpu").')
     parser.add_argument('--seed', default=42, type=int, help='Random seed.')
@@ -34,45 +29,6 @@ def get_args_parser():
     # --- Distributed Training Parameters ---
     parser.add_argument('--world_size', default=1, type=int, help='Number of distributed processes.')
     parser.add_argument('--dist_url', default='env://', help='URL used to set up distributed training.')
-
-    # --- Model Specific Parameters (for MyWanPipeline) ---
-    parser.add_argument('--model_id', type=str, default="Wan2.1-T2V-1.3B-Diffusers_download",
-                        help="HuggingFace model ID or local path for Wan pipeline components.")
-    parser.add_argument('--pretrained_weights', type=str, default=None,
-                        help="Path to the pretrained model (e.g., fine-tuned pipeline checkpoint).") 
-    
-    # Freeze and LoRA options
-    parser.add_argument('--freeze_text_encoder', action='store_true', help='Freeze text encoder.')
-    parser.add_argument('--freeze_transformer_core', action='store_true',
-                        help='Freeze transformer core weights (if not using LoRA).')
-    parser.add_argument('--use_lora', action='store_true', help='Use LoRA for transformer fine-tuning.')
-    parser.add_argument('--lora_rank', default=4, type=int, help='LoRA rank if use_lora is True.')
-    parser.add_argument('--enable_gradient_checkpointing', action='store_true',
-                        help='Enable gradient checkpointing for transformer to save memory.')
-    
-    # Mask Encoder/Decoder specific
-    parser.add_argument('--mask_latent_channels', default=4, type=int,
-                        help='Number of channels for the mask latent space (output of mask_encoder).')
-    
-    # --- Learning Rate Adjustments for Specific Modules ---
-    parser.add_argument('--lr_lora', default=1e-4, type=float,
-                        help='Learning rate for LoRA parameters. If None, uses main LR.')
-    parser.add_argument('--lr_mask_encoder', default=None, type=float,
-                        help='Learning rate for Mask Encoder. If None, uses main LR.')
-    parser.add_argument('--lr_mask_decoder', default=None, type=float,
-                        help='Learning rate for Mask Decoder. If None, uses main LR.')
-
-    # --- Loss Coefficients ---
-    parser.add_argument('--video_latent_loss_weight', type=float, default=1,
-                        help='Weight for the video latent space reconstruction loss (MSE).')
-    parser.add_argument('--mask_latent_flow_loss_weight', type=float, default=1.0,
-                        help='Weight for the mask latent space Flow Matching loss (MSE).')
-    parser.add_argument('--mask_pixel_focal_loss_weight', type=float, default=8.0,
-                        help='Weight for the pixel-level mask focal loss.')
-    parser.add_argument('--mask_pixel_dice_loss_weight', type=float, default=4.0,
-                        help='Weight for the pixel-level mask dice loss.')
-    parser.add_argument('--focal_alpha', default=0.25, type=float,
-                        help='Alpha parameter for Focal Loss on pixel masks.')
     
     # --- Video & Frame Dimensions ---
     parser.add_argument('--num_frames', default=17, type=int,
@@ -104,8 +60,6 @@ def get_args_parser():
                         help="Max longer side size for frame preprocessing.")
     parser.add_argument('--binary', action='store_true',
                         help='Use binary mask segmentation (e.g., for A2D/JHMDB).')
-    parser.add_argument('--remove_difficult', action='store_true',
-                        help='Remove difficult samples from dataset (if applicable).')
     
     # --- Evaluation / Inference Parameters ---
     parser.add_argument('--eval', default=False, action='store_true', help='Run evaluation only.')
@@ -117,15 +71,6 @@ def get_args_parser():
                         help='Dataset split for evaluation (e.g., "valid", "test").')
     parser.add_argument('--visualize', action='store_true',
                         help='Whether to visualize the masks during inference.')
-    
-    # --- Misc. Parameters (Cleaned up from old ones) ---
-    parser.add_argument('--tag', default='debug', type=str,
-                        help='An arbitrary tag for experiment organization.')
-    parser.add_argument('--exp_name', default='main', type=str,
-                        help='Experiment name for logging and output directories.')
-    parser.add_argument('--current_epoch', default=0, type=int,
-                        help='Current epoch count (for resuming/logging, usually set by trainer).')
-
 
     parser.add_argument('--high_reso', default=False, action='store_true',
                         help="higher resolution for 5b model")
