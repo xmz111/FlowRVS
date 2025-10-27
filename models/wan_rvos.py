@@ -99,7 +99,7 @@ def build_dit(args):
     transformer.load_state_dict(loaded_state_dict_part1, strict=False)
     transformer.load_state_dict(loaded_state_dict_part2, strict=False)
     
-    transformer = transformer.to(target_dtype)
+    #transformer = transformer.to(target_dtype)
     '''
     transformer = WanTransformer3DModel.from_pretrained(
         model_id, 
