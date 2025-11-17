@@ -102,7 +102,6 @@ def prepare():
     print(f"[Loading checkpoint from {args.vae_ckpt}]")
     vae_checkpoint = torch.load(args.vae_ckpt, map_location='cpu', weights_only=False)
     vae_state_dict = vae_checkpoint.get('model', vae_checkpoint)
-    torch.save(vae_state_dict, 'decoder.pth')
     missing_keys, unexpected_keys = mask_vae.load_state_dict(vae_state_dict, strict=True)
     unexpected_keys = [k for k in unexpected_keys if not (k.endswith('total_params') or k.endswith('total_ops'))]
     if len(missing_keys) > 0:
