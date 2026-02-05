@@ -87,7 +87,9 @@ Note that this code will cost about 33G GPU memory with default setting.
 
 ## 🥂 Training
 
-
+```
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=mevis --num_frames=17 --lr=5e-5 --output_dir=mevis_training 
+```
 ## 💚 Acknowledgement
 
 We referenced the following works, and appreciate their contributions to the community.
