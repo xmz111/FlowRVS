@@ -14,11 +14,6 @@ import numpy as np
 from numpy import random as rand
 from PIL import Image
 import cv2
-try:
-    import accimage
-except ImportError:
-    accimage = None
-from torchvision.transforms.functional import InterpolationMode, _interpolation_modes_from_int
 from collections.abc import Sequence
 from typing import Tuple, List, Optional
 import numbers

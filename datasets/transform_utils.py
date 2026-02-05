@@ -90,14 +90,13 @@ def denormalize(tens):
 
     return (tens*std)+mean
 
-
 def make_coco_transforms(image_set, max_size, resize=False):
     normalize = TV.Compose([
         TV.ToTensor(),
-        TV.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        TV.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
 
-    scales = [384, 416, 448, 480, 512, 544, 576, 608]
+    scales = [480]
     if image_set == 'vae':
         return TV.Compose(
             [
@@ -106,7 +105,7 @@ def make_coco_transforms(image_set, max_size, resize=False):
             ]
         )
         
-    if image_set == 'train':
+    if image_set == 'train' or image_set == 'valid_u':
         return TV.Compose([
             TV.RandomSelect(
                 TV.Compose([
@@ -121,11 +120,10 @@ def make_coco_transforms(image_set, max_size, resize=False):
                 ])
             ),
             TV.RandomHorizontalFlip(),
-            TV.PhotometricDistort(),
             normalize,
         ])
         
-    if image_set == 'valid' or image_set == 'valid_u' or image_set == 'val':
+    if image_set == 'valid' or image_set == 'val':
         return TV.Compose(
             [
                 TV.RandomResize([480], max_size=832),
@@ -134,42 +132,6 @@ def make_coco_transforms(image_set, max_size, resize=False):
         )
     
     raise ValueError(f'unknown {image_set}')
-
-def make_coco_transforms_big(image_set, max_size, resize=False):
-    normalize = TV.Compose([
-        TV.ToTensor(),
-        TV.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
-
-    scales = [512, 544, 576, 608, 640, 672, 704, 736]
-    if image_set != 'train':
-        return TV.Compose(
-            [
-                TV.RandomResize([704], max_size=max_size),
-                normalize,
-            ]
-        )
-    if image_set == 'train':
-        return TV.Compose([
-            TV.RandomSelect(
-                TV.Compose([
-                    TV.RandomResize(scales, max_size=max_size),
-                    TV.Check(),
-                ]),
-                TV.Compose([
-                    TV.RandomResize([500, 600, 700]),
-                    TV.RandomSizeCrop(480, 700),
-                    TV.RandomResize(scales, max_size=max_size),
-                    TV.Check(),
-                ])
-            ),
-            TV.RandomHorizontalFlip(),
-            TV.PhotometricDistort(),
-            normalize,
-        ])
-    
-    raise ValueError(f'unknown {image_set}')
-
 
 
 class FrameSampler:
@@ -258,7 +220,7 @@ class VideoEvalDataset(Dataset):
         self.transform = TF.Compose([
             TF.Lambda(lambda img: resize_to_multiple_of_32_and_fit_box(img, multiple=16, target_h=target_h, target_w=target_w)),
             TF.ToTensor(),
-            TF.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            TF.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
             
     def __len__(self):
@@ -297,28 +259,3 @@ def check_shape(imgs):
 
     return imgs
 
-def check_shape_big(imgs):
-    # b, c, t, h, w  vae and dit requirement.
-    if imgs.shape[-1] % 32 == 0 and imgs.shape[-2] % 32 == 0:
-        return imgs
-    
-    else:
-        # Assuming you want to resize mask_input to video_input's size
-        target_h = math.ceil(imgs.shape[-2] / 32) * 32
-        target_w = math.ceil(imgs.shape[-1] / 32) * 32
-        
-        # Reshape mask_input to [B*F, C_mask, H_mask, W_mask] temporarily for interpolation
-        original_shape = imgs.shape
-        imgs_reshaped = imgs.view(-1, original_shape[1], original_shape[3], original_shape[4])
-        
-        imgs_input = F.interpolate(
-            imgs_reshaped,
-            size=(target_h, target_w),
-            mode='bilinear', 
-            #align_corners=False
-        )
-        
-        # Reshape back to original 5D format [B, C_mask, F, H_video, W_video]
-        imgs = imgs_input.view(original_shape[0], original_shape[1], original_shape[2], target_h, target_w)
-
-    return imgs
