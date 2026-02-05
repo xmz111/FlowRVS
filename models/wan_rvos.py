@@ -1,8 +1,3 @@
-"""
-Modified from DETR and SgMg (https://github.com/facebookresearch/detr, https://github.com/bo-miao/SgMg) 
-"""
-import time
-
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -17,25 +12,6 @@ def _get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # this disables a huggingface tokenizer warning (printed every epoch)
-
-
-
-
-class MLP(nn.Module):
-    """ Very simple multi-layer perceptron (also called FFN)"""
-
-    def __init__(self, input_dim, hidden_dim, output_dim, num_layers):
-        super().__init__()
-        self.num_layers = num_layers
-        h = [hidden_dim] * (num_layers - 1)
-        self.layers = nn.ModuleList(nn.Linear(n, k) for n, k in zip([input_dim] + h, h + [output_dim]))
-
-    def forward(self, x):
-        for i, layer in enumerate(self.layers):
-            x = F.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
-        return x
-
-
 
 def adapt_dit_for_concat_input(transformer: WanTransformer3DModel, video_latent_channels: int, mask_latent_channels: int):
     """
@@ -84,7 +60,6 @@ def adapt_dit_for_concat_input(transformer: WanTransformer3DModel, video_latent_
 def build_dit(args):
     device = torch.device(args.device)
 
-    target_dtype = torch.bfloat16
     model_id = "Wan2.1-T2V-1.3B-Diffusers"
     config = WanTransformer3DModel.load_config(model_id, subfolder="transformer")
 
@@ -99,18 +74,10 @@ def build_dit(args):
     transformer.load_state_dict(loaded_state_dict_part1, strict=False)
     transformer.load_state_dict(loaded_state_dict_part2, strict=False)
     
-    #transformer = transformer.to(target_dtype)
-    '''
-    transformer = WanTransformer3DModel.from_pretrained(
-        model_id, 
-        subfolder="transformer", 
-        torch_dtype=target_dtype,
-    )
-    '''
-    
-    transformer.enable_gradient_checkpointing()
+    if args.use_gradient_ckpt:
+        transformer.enable_gradient_checkpointing()
+    if args.use_dvi:
+        video_latent_channels, mask_latent_channels = 16, 16
+        adapt_dit_for_concat_input(transformer, video_latent_channels, mask_latent_channels)
     transformer.to(device)
-    video_latent_channels, mask_latent_channels = 16, 16
-    adapt_dit_for_concat_input(transformer, video_latent_channels, mask_latent_channels)
-    
     return transformer

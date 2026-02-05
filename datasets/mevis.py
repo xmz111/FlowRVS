@@ -248,12 +248,8 @@ def build(image_set, args):
     }
     img_folder, ann_file = PATHS[image_set]
 
-    if args.big:
-        dataset = MeViSDataset(img_folder, ann_file, transforms=make_coco_transforms_big(image_set, max_size=1024, resize=args.augm_resize),
-                            num_frames=args.num_frames)
-    else:
-        dataset = MeViSDataset(img_folder, ann_file, transforms=make_coco_transforms(image_set, max_size=args.max_size, resize=args.augm_resize),
-                           num_frames=args.num_frames)
+    dataset = MeViSDataset(img_folder, ann_file, transforms=make_coco_transforms(image_set, max_size=args.max_size, resize=args.augm_resize),
+                        num_frames=args.num_frames)
     return dataset
 
 

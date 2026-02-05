@@ -4,13 +4,13 @@ def get_args_parser():
     parser = argparse.ArgumentParser('WanPipeline R-VOS training and inference scripts.', add_help=False)
 
     # --- Training & Optimization Parameters ---
-    parser.add_argument('--lr', default=7e-5, type=float, help="Main learning rate.")
+    parser.add_argument('--lr', default=5e-5, type=float, help="Main learning rate.")
     parser.add_argument('--lr_drop', default=[30], type=int, nargs='+',
                         help='Epochs to drop learning rate.')
     parser.add_argument('--batch_size', default=1, type=int, help="Batch size for training.")
     parser.add_argument('--weight_decay', default=5e-4, type=float, help="Weight decay.")
-    parser.add_argument('--epochs', default=200, type=int, help="Total number of training epochs.")
-    parser.add_argument('--clip_max_norm', default=0.1, type=float,
+    parser.add_argument('--epochs', default=50, type=int, help="Total number of training epochs.")
+    parser.add_argument('--clip_max_norm', default=1.0, type=float,
                         help='Gradient clipping max norm.')
     parser.add_argument('--amp', default=False, action='store_true',
                         help='Enable Automatic Mixed Precision (AMP) training.')
@@ -25,6 +25,8 @@ def get_args_parser():
     parser.add_argument('--num_workers', default=4, type=int, help='Number of data loading workers.')
     parser.add_argument('--cache_mode', default=False, action='store_true',
                         help='Whether to cache images/videos on memory.')
+    parser.add_argument('--use_gradient_ckpt', default=True, help='enable_gradient_checkpointing for DiT')
+    parser.add_argument('--use_dvi', default=False, help='Use DVI strategy')
 
     # --- Distributed Training Parameters ---
     parser.add_argument('--world_size', default=1, type=int, help='Number of distributed processes.')
@@ -35,8 +37,6 @@ def get_args_parser():
                         help="Number of frames processed per video clip by the pipeline.")
     parser.add_argument('--image_size', default=512, type=int,
                         help="Input image/frame resolution (e.g., 512x512).")
-    parser.add_argument('--latent_resolution_scale', default=8, type=int,
-                        help="Scale factor from pixel space to VAE latent space (e.g., 512 / 8 = 64).")
     
     # --- Dataset Parameters ---
     parser.add_argument('--dataset_file', default='ytvos', help='Dataset name (e.g., "ytvos", "davis").')
@@ -72,9 +72,5 @@ def get_args_parser():
     parser.add_argument('--visualize', action='store_true',
                         help='Whether to visualize the masks during inference.')
 
-    parser.add_argument('--high_reso', default=False, action='store_true',
-                        help="higher resolution for 5b model")
-    parser.add_argument('--big', default=False, action='store_true',
-                        help="5b model")
     return parser
 
