@@ -70,11 +70,17 @@ After you successfully download the dataset, the file structure of the dataset s
         * JPEGImages/
         * mask_dict.json
         * meta_expressions.json
+```
+pip install gdown
+gdown https://drive.google.com/drive/folders/1MACaQ-O8seyMj-MBlycxRgCT08RVBZJp --folder -O dataset/MeViS/
+```
 #### 2. Download DiT and tuned VAE checkpoints from  https://huggingface.co/xmz111/FlowRVS  and place them as mevis_dit.pth and tuned_vae.pth;
 #### 3.  Inference
 Just run:
 
-``` python inference_mevis.py --dit_ckpt=mevis_dit.pth --vae_ckpt=tuned_vae.pth --output_dir=mevis_eval_new --split=valid_u ```
+``` 
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ckpt=wan2.1_mevis_inference_bf16.pth --vae_ckpt=tuned_vae.pth --output_dir=result --split=valid_u
+```
    
 Note that this code will cost about 33G GPU memory with default setting.
 

@@ -371,6 +371,7 @@ class WanTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin, FromOrigi
         added_kv_proj_dim: Optional[int] = None,
         rope_max_seq_len: int = 1024,
         mask_branch: bool = False,
+        use_dvi: bool = False,
     ) -> None:
         super().__init__()
 
@@ -409,6 +410,8 @@ class WanTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin, FromOrigi
 
         self.gradient_checkpointing = False
 
+        self.use_dvi = use_dvi
+        
     def forward(
         self,
         hidden_states: torch.Tensor,
@@ -442,8 +445,9 @@ class WanTransformer3DModel(ModelMixin, ConfigMixin, PeftAdapterMixin, FromOrigi
         post_patch_width = width // p_w
 
         rotary_emb = self.rope(hidden_states)
-        
-        hidden_states = torch.concat([hidden_states, video_condition], dim=1)
+
+        if self.use_dvi:
+            hidden_states = torch.concat([hidden_states, video_condition], dim=1)
         
         hidden_states = self.patch_embedding(hidden_states) 
         hidden_states = hidden_states.flatten(2).transpose(1, 2)

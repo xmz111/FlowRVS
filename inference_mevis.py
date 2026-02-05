@@ -35,13 +35,6 @@ from diffusers.training_utils import EMAModel
 color_list = colormap()
 color_list = color_list.astype('uint8').tolist()
 
-def save_file(cfg_path, script_path):
-    with open(script_path, 'r') as file: 
-        content = file.read()
-    with open(cfg_path + '/' + script_path.split('/')[-1], 'w') as file: 
-        file.write(content) 
-        print(f"File {script_path} saved.")
-
 def load_modeles(device):
     target_dtype = torch.bfloat16
     model_id = "Wan2.1-T2V-1.3B-Diffusers" 
@@ -104,10 +97,7 @@ def main(args):
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    if utils.is_main_process():
-        save_file(args.output_dir, 'inference_mevis.py')
-        
-    # fix the seed for reproducibility
+
     seed = args.seed + utils.get_rank()
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -211,29 +201,8 @@ def prepare():
     
     return model_without_ddp, vae, text_processor, scheduler
 
-def pad_frames_to_multiple(frames, num_frames_per_clip):
-    current_length = len(frames)
-    if current_length == 0:
-        return []
 
-    remainder = current_length % num_frames_per_clip
-    if remainder == 0:
-        return frames
-
-    target_length = current_length + (num_frames_per_clip - remainder)
-    frames_to_keep_count = max(0, current_length - remainder)
-    new_frames = frames[:frames_to_keep_count]
-
-    appended_count = target_length - len(new_frames)
-    
-    for k in range(appended_count):
-        source_idx = (current_length - num_frames_per_clip + k) % current_length
-        new_frames.append(frames[source_idx])
-
-    return new_frames
-
-
-def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_path_prefix, save_visualize_path_prefix, split='valid_u'):
+def eval_mevis(args, model, vae, text_processor, scheduler, save_path_prefix, save_visualize_path_prefix, split='valid_u'):
     # load data
     root = Path(args.mevis_path)
     img_folder = join(root, split, "JPEGImages")
@@ -342,7 +311,6 @@ def eval_mevis(args, model, vae, text_processor, pixel_head, scheduler, save_pat
                         prompt=[exp], 
                         device=args.device,
                         dtype=vae.dtype,
-                        do_classifier_free_guidance=args.cfg,
                     )
                     
                     shift = 3

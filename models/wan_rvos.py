@@ -62,6 +62,7 @@ def build_dit(args):
 
     model_id = "Wan2.1-T2V-1.3B-Diffusers"
     config = WanTransformer3DModel.load_config(model_id, subfolder="transformer")
+    config["use_dvi"] = args.use_dvi  # 假设 args 里有这个布尔值
 
     transformer = WanTransformer3DModel(**config)
     

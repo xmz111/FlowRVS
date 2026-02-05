@@ -25,7 +25,6 @@ from models.wan_rvos import build_dit as build_model
 from models.text import TextProcessor
 import opts
 import warnings
-from peft import LoraConfig, get_peft_model, TaskType
 warnings.filterwarnings("ignore")
 from diffusers.training_utils import EMAModel
 
@@ -147,7 +146,7 @@ def main(args):
         else:
             print("[Warning] No EMA found in checkpoint, using standard weights.")
     else:
-        raise ValueError('Please specify the checkpoint for inference using --resume.')
+        print("Training from scratch")
 
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
@@ -169,11 +168,7 @@ def main(args):
         param_dicts[0]["params"].append(p)
         
 
-    optimizer = bnb.optim.AdamW8bit(
-        param_dicts, 
-        lr=args.lr, 
-        weight_decay=args.weight_decay
-    )
+    optimizer = torch.optim.AdamW(param_dicts, lr=args.lr, weight_decay=args.weight_decay)
     
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_drop, gamma=0.9)
     grad_scaler = torch.cuda.amp.GradScaler(enabled=args.amp)

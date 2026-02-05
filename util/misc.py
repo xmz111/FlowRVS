@@ -442,11 +442,6 @@ def save_on_master(*args, **kwargs):
 
 
 def init_distributed_mode(args):
-    if args.no_distributed:
-        print('Not using distributed mode')
-        args.distributed = False
-        args.ngpu = 1
-        return
 
     if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
         args.rank = int(os.environ["RANK"])

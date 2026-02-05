@@ -16,7 +16,7 @@ import json
 import numpy as np
 import random
 #from datasets.transform_utils import FrameSampler, make_coco_transforms
-from datasets.transform_utils import make_coco_transforms, make_coco_transforms_big
+from datasets.transform_utils import make_coco_transforms
 from pycocotools import mask as coco_mask
 import datasets.transforms_video as T
 
