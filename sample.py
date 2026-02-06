@@ -26,32 +26,10 @@ def boundary_biased_sample(
     special_freq: float = 0.1, 
     device: torch.device = torch.device("cpu")
 ) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    Generates custom timesteps for training, allowing control over specific timestep frequencies.
-    Modified to handle num_samples_per_batch = 1 correctly for probability control.
-
-    Args:
-        total_train_timesteps (int): The total number of diffusion steps used during training (e.g., 1000).
-        num_samples_per_batch (int): The total number of timesteps to generate for the current batch.
-        sampling_strategy (str): The base strategy to sample timesteps ("uniform", "bias_video", "bias_mask", "karras").
-        bias_param (float): Parameter to control the degree of bias for "bias_video", "bias_mask".
-        special_timesteps (Optional[List[int]]): List of specific integer timesteps whose frequency needs to be controlled.
-                                                If None, no special frequency control is applied.
-        special_freq (float): The proportion of the batch that should be dedicated to `special_timesteps`.
-                              e.g., 0.1 means 10% of `num_samples_per_batch` will be from `special_timesteps`.
-        device (torch.device): The device to place the tensors on.
-
-    Returns:
-        Tuple[torch.Tensor, torch.Tensor]:
-            - timestep_for_dit (torch.Tensor): Integer timesteps (shape: [batch_size]).
-            - t_expanded (torch.Tensor): Continuous time embeddings (shape: [batch_size, 1, 1, 1, 1]).
-    """
 
     if special_timesteps is not None and not isinstance(special_timesteps, list):
         special_timesteps = [special_timesteps] # Ensure it's a list
 
-    # --- Decision logic for generating timesteps ---
-    
     # Validate special_timesteps first
     valid_special_timesteps = []
     if special_timesteps:
@@ -62,7 +40,6 @@ def boundary_biased_sample(
             print(f"Warning: Some special timesteps were out of range [1, {total_train_timesteps}] and were ignored.")
         special_timesteps = valid_special_timesteps
 
-    # --- Case 1: num_samples_per_batch is 1 ---
     if num_samples_per_batch == 1:
         # Use special_freq as a direct probability for this single sample
         if special_timesteps and torch.rand(1, device=device).item() < special_freq:
@@ -117,7 +94,6 @@ def boundary_biased_sample(
 
         timestep_for_dit = chosen_timestep_int.to(device=device)
 
-    # --- Case 2: num_samples_per_batch > 1 (Original logic) ---
     else:
         # Determine how many "regular" samples we need to generate
         num_special_samples = 0
@@ -131,7 +107,6 @@ def boundary_biased_sample(
             num_regular_samples = num_samples_per_batch
             num_special_samples = 0
 
-        # --- Generate the "regular" samples ---
         regular_timesteps_int = None
         if num_regular_samples > 0:
             if sampling_strategy == "uniform":
@@ -166,7 +141,6 @@ def boundary_biased_sample(
             else:
                 raise ValueError(f"Unsupported sampling_strategy: {sampling_strategy}")
 
-        # --- Generate the "special" samples ---
         special_timesteps_int = None
         if num_special_samples > 0 and special_timesteps and len(special_timesteps) > 0:
             special_ts_tensor = torch.tensor(special_timesteps, device=device, dtype=torch.long)
@@ -195,7 +169,6 @@ def boundary_biased_sample(
         
         timestep_for_dit = timestep_for_dit[:num_samples_per_batch]
 
-    # --- Convert integer timesteps to continuous t and expanded t ---
     t_continuous = timestep_for_dit.float() / total_train_timesteps
     t_continuous = t_continuous.clamp(1e-5, 1.0)
     
