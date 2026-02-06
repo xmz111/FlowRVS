@@ -8,7 +8,7 @@
 </p>
 
 ## 📢 News
-[2026.01.26] FlowRVS was accepted by ICLR 2026!
+[2026.01.26] FlowRVS was accepted by ICLR 2026!  
 [2026.02.05] We updated training codes.
 
 ## 🏄‍♂️ Overview
