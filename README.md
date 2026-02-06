@@ -7,7 +7,9 @@
   </a>
 </p>
 
-
+## 📢 News
+[2026.01.26] FlowRVS was accepted by ICLR 2026!
+[2026.02.05] We updated training codes.
 
 ## 🏄‍♂️ Overview
 
@@ -33,7 +35,7 @@
 ## 🕒 Open-Source Plan
  - [x] Model and Inference Code
  - [x] Model Weight and Inference Guidance 
- - [ ] Training Code and Guidance (will be released very soon)
+ - [x] Training Code and Guidance
 
 ## 🛠️ Environment Setup
 
@@ -79,14 +81,14 @@ gdown https://drive.google.com/drive/folders/1MACaQ-O8seyMj-MBlycxRgCT08RVBZJp -
 Just run:
 
 ``` 
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ckpt=wan2.1_mevis_inference_bf16.pth --vae_ckpt=tuned_vae.pth --output_dir=result --split=valid_u
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ckpt=FlowRVS_dit_mevis.pth --vae_ckpt=tuned_vae.pth --output_dir=result --split=valid_u
 ```
    
 Note that this code will cost about 33G GPU memory with default setting.
 
 
 ## 🥂 Training
-
+Use --dataset_file to select training dataset (mevis, pretrain, ytvos), and use --resume to load checkpoint.
 ```
 CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=mevis --num_frames=17 --lr=5e-5 --output_dir=mevis_training 
 ```
@@ -95,6 +97,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 We referenced the following works, and appreciate their contributions to the community.
 
 - [Wan2.1](https://github.com/Wan-Video/Wan2.1)
+- [MeViS](https://github.com/henghuiding/MeViS)
 
 
 ## 🔗 BibTeX
