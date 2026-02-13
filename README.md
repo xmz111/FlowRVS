@@ -98,16 +98,21 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 
 ### 🎬 Demos
 
-<div align="center">
-  <h3>🤖 Demo 1: Ultraman vs. Giant Cat</h3>
-  
-  <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="45%" controls="controls"></video>
-  
-  <br/> <p>
-    <b>Prompt:</b> "the Ultraman", "the devil cat"<br>
-    <b>Description:</b> This video demonstrates the segmentation of a complex dynamic scene.
-  </p>
-</div>
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="100%" controls="controls"></video>
+    </td>
+    <td width="50%">
+      <h3>🦸‍♂️ Ultraman Demo</h3>
+      <ul>
+        <li><b>Model:</b> FlowRVS-Large</li>
+        <li><b>FPS:</b> 24</li>
+        <li><b>Note:</b> Observe the edge consistency on the cat's fur.</li>
+      </ul>
+    </td>
+  </tr>
+</table>>
 
 ## 💚 Acknowledgement
 
