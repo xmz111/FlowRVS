@@ -99,9 +99,15 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 ### 🎬 Demos
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="80%">
-  </video>
-</div>|
+  <h3>🤖 Demo 1: Ultraman vs. Giant Cat</h3>
+  
+  <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="45%" controls="controls"></video>
+  
+  <br/> <p>
+    <b>Prompt:</b> "the Ultraman", "the devil cat"<br>
+    <b>Description:</b> This video demonstrates the segmentation of a complex dynamic scene.
+  </p>
+</div>
 
 ## 💚 Acknowledgement
 
