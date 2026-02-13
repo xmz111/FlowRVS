@@ -98,13 +98,10 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 
 ### 🎬 Demos
 
-| **Ultraman vs. Cat** | **Better Call Saul** |
-| :---: | :---: |
-| !["Ultraman"](assets/automan_result.mp4) | !["Saul"](assets/saul_result.mp4) |
-
-| **Basketball** | **Cat Demos** |
-| :---: | :---: |
-| !["Basketball"](assets/jams_curry_result.gif) | !["Cat"](assets/the_aggressive_cat_output.gif) |
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="80%">
+  </video>
+</div>|
 
 ## 💚 Acknowledgement
 
