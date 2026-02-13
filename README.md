@@ -98,21 +98,23 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 
 ### 🎬 Demos
 We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
-<table align="center">
+<table border="0" align="center">
   <tr>
-    <td align="center" width="70%">
-      <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="100%" controls="controls"></video>
+    <td width="70%" align="center">
+      <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350#.mp4" width="100%" controls="controls" muted="muted"></video>
     </td>
-    <td width="30%">
-      <h3>🦾🐱 Ultraman Demo</h3>
+    <td width="30%" valign="top">
+      <h3>🦾🐱 Ultraman</h3>
       <ul>
         <li><b>FPS:</b> 12</li>
-        <li><b>Prompt:</b> "the Ultraman" "the devil cat"</li>
-        <li><b>Note:</b> FlowRVS can segment in smoke.</li>
+        <li><b>Prompt:</b> "the Ultraman", "the devil cat"</li>
+        <li><b>Note:</b> FlowRVS can segment objects effectively even in smoke/fog.</li>
       </ul>
     </td>
   </tr>
 </table>>
+
+<br/>
 
 <table align="center">
   <tr>
@@ -128,7 +130,9 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
       </ul>
     </td>
   </tr>
-</table>>
+</table>
+
+<br/>
 
 <table align="center">
   <tr>
@@ -144,34 +148,32 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
       </ul>
     </td>
   </tr>
-</table>>
+</table>
 
-<h3 align="center">🐱 Cat Memes Segmentation Demos</h3>
+<br/>
+
+<h3 align="center">🐱 Cat Memes Segmentation</h3>
 
 <div align="center">
-  <table border="0" cellspacing="10" cellpadding="5">
-    
+  <table border="0">
     <tr>
-      <td align="center" valign="middle">
-        <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls="controls" muted="muted"></video>
+      <td align="center">
+         <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls="controls" muted="muted"></video>
       </td>
-      <td align="center" valign="middle">
-        <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55dbf6c238" height="300" controls="controls" muted="muted"></video>
+      <td align="center">
+         <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls="controls" muted="muted"></video>
       </td>
     </tr>
-    
     <tr>
-      <td colspan="2" align="left" style="padding-top: 15px;">
-        <ul>
-          <li><b>FPS:</b> 9 </li>
-          <li><b>Note:</b> These demos showcase robust segmentation on challenging internet memes. The model successfully handles rapid, blurry motion (left video) and significant body deformations during dramatic poses (right video, the "dying cat" meme), maintaining consistent tracking throughout.</li>
-        </ul>
+      <td colspan="2" align="left">
+         <ul>
+           <li><b>FPS:</b> 9 (Real-time)</li>
+           <li><b>Note:</b> These demos showcase robust segmentation on challenging internet memes. The model successfully handles rapid, blurry motion (left) and significant body deformations (right).</li>
+         </ul>
       </td>
     </tr>
-    
   </table>
 </div>
-<br/> ```
 
 ## 💚 Acknowledgement
 
