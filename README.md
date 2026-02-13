@@ -32,31 +32,6 @@
   <img src="assets/method.jpg" alt="Result" style="width:92%;">
 </p>
 
-
-## 🕒 Open-Source Plan
- - [x] Model and Inference Code
- - [x] Model Weight and Inference Guidance 
- - [x] Training Code and Guidance
-
-## 🛠️ Environment Setup
-
-#### 1. Create a conda environment
-```
-git clone https://github.com/xmz111/FlowRVS.git && cd FlowRVS
-conda create -n flowrvs python=3.10 -y
-conda activate flowrvs
-```
-#### 2. Install  dependencies
-```
-pip install -r requirements.txt
-```
-
-#### 3. Prepare Wan2.1 T2V model, we need config to construct models and T5 Encoder.
-```
-pip install "huggingface_hub[cli]"
-huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
-```
-
 ### 🎬 Demos
 We provide weights trained exclusively on the challenging MeViS dataset. Despite not seeing these domains during training, FlowRVS demonstrates remarkable zero-shot generalization across movies, sports, and internet memes. Have fun exploring!
 
@@ -133,6 +108,30 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 <li>Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
 </ul>
 
+
+## 🕒 Open-Source Plan
+ - [x] Model and Inference Code
+ - [x] Model Weight and Inference Guidance 
+ - [x] Training Code and Guidance
+
+## 🛠️ Environment Setup
+
+#### 1. Create a conda environment
+```
+git clone https://github.com/xmz111/FlowRVS.git && cd FlowRVS
+conda create -n flowrvs python=3.10 -y
+conda activate flowrvs
+```
+#### 2. Install  dependencies
+```
+pip install -r requirements.txt
+```
+
+#### 3. Prepare Wan2.1 T2V model, we need config to construct models and T5 Encoder.
+```
+pip install "huggingface_hub[cli]"
+huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
+```
 
 
 ## 🍻 Inference
