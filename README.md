@@ -100,11 +100,11 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
 <table align="center">
   <tr>
-    <td align="center" width="50%">
+    <td align="center" width="70%">
       <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350" width="100%" controls="controls"></video>
     </td>
-    <td width="50%">
-      <h3>🦸‍♂️ Ultraman Demo</h3>
+    <td width="30%">
+      <h3>🦾🐱 Ultraman Demo</h3>
       <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the Ultraman" "the devil cat"</li>
@@ -116,38 +116,62 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
 
 <table align="center">
   <tr>
-    <td align="center" width="50%">
+    <td align="center" width="70%">
       <video src="https://github.com/user-attachments/assets/1d3bd1f3-ded9-4b50-8c43-689b2aac3e90" width="100%" controls="controls"></video>
     </td>
-    <td width="50%">
-      <h3>🦸‍♂️ Basketball Demo</h3>
+    <td width="30%">
+      <h3>⛹️‍♂️🏀 Basketball Demo</h3>
       <ul>
-        <li><b>FPS:</b> "the man wearing colorful shoes shoots tha ball" "tha man who is defending" "bastekball"</li>
-        <li><b>Prompt:</b> 12</li>
+        <li><b>FPS:</b> 12</li>
+        <li><b>Prompt:</b> "the man wearing colorful shoes shoots tha ball" "tha man who is defending" "bastekball"</li>
         <li><b>Note:</b> FlowRVS can distinguish small objects like basketball.</li>
       </ul>
     </td>
   </tr>
 </table>>
 
-<h3 align="center">🐱 Cat Demos</h3>
+<table align="center">
+  <tr>
+    <td align="center" width="70%">
+      <video src="https://github.com/user-attachments/assets/480d39fb-e378-4733-be3e-a3a47e159875" width="100%" controls="controls"></video>
+    </td>
+    <td width="30%">
+      <h3>⚖️ "Better Call Saul" Demo</h3>
+      <ul>
+        <li><b>FPS:</b> 8</li>
+        <li><b>Prompt:</b> "angry man in the suit shouting at another man"</li>
+        <li><b>Note:</b> FlowRVS can long term setting.</li>
+      </ul>
+    </td>
+  </tr>
+</table>>
+
+<h3 align="center">🐱 Cat Memes Segmentation Demos</h3>
 
 <div align="center">
-  <table>
+  <table border="0" cellspacing="10" cellpadding="5">
+    
     <tr>
-      <td align="center">
-        <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls></video>
+      <td align="center" valign="middle">
+        <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls="controls" muted="muted"></video>
       </td>
-      <td align="center">
-        <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls></video>
+      <td align="center" valign="middle">
+        <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55dbf6c238" height="300" controls="controls" muted="muted"></video>
       </td>
     </tr>
+    
     <tr>
-      <td align="center"><b>Aggressive Cat</b></td>
-      <td align="center"><b>Dying Cat</b></td>
+      <td colspan="2" align="left" style="padding-top: 15px;">
+        <ul>
+          <li><b>FPS:</b> 9 </li>
+          <li><b>Note:</b> These demos showcase robust segmentation on challenging internet memes. The model successfully handles rapid, blurry motion (left video) and significant body deformations during dramatic poses (right video, the "dying cat" meme), maintaining consistent tracking throughout.</li>
+        </ul>
+      </td>
     </tr>
+    
   </table>
 </div>
+<br/> ```
 
 ## 💚 Acknowledgement
 
