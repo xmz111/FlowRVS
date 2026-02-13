@@ -57,46 +57,6 @@ pip install "huggingface_hub[cli]"
 huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers --local-dir ./Wan2.1-T2V-1.3B-Diffusers
 ```
 
-
-
-## 🍻 Inference
-### Inference on MeViS val and val_u splits.
-#### 1. Prepare data
-The dataset can be found in: https://github.com/henghuiding/MeViS  
-After you successfully download the dataset, the file structure of the dataset should be like this:
-* datasets
-    * MeViS/
-      * valid/
-        * JPEGImages/  
-        * meta_expressions.json
-      * valid_u/
-        * JPEGImages/
-        * mask_dict.json
-        * meta_expressions.json
-```
-pip install gdown
-gdown https://drive.google.com/drive/folders/1MACaQ-O8seyMj-MBlycxRgCT08RVBZJp --folder -O dataset/MeViS/
-```
-#### 2. Download DiT and tuned VAE checkpoints from  https://huggingface.co/xmz111/FlowRVS  and place them as mevis_dit.pth and tuned_vae.pth;
-#### 3.  Inference
-Just run:
-
-``` 
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ckpt=FlowRVS_dit_mevis.pth --vae_ckpt=tuned_vae.pth --output_dir=result --split=valid_u
-```
-   
-Note that this code will cost about 33G GPU memory with default setting.
-
-### Inference on any videos.
-```
-python inference_demo.py --input_path=video.mp4  --text_prompts "prompt_1" "prompt_2"    --fps=12 --save_fig --output_dir=result  --dit_ckpt=FlowRVS_dit_mevis.pth  --vae_ckpt=tuned_vae.pth
-```
-## 🥂 Training
-Use --dataset_file to select training dataset (mevis, pretrain, ytvos), and use --resume to load checkpoint.
-```
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=mevis --num_frames=17 --lr=5e-5 --output_dir=mevis_training 
-```
-
 ### 🎬 Demos
 We provide weights trained exclusively on the challenging MeViS dataset. Despite not seeing these domains during training, FlowRVS demonstrates remarkable zero-shot generalization across movies, sports, and internet memes. Have fun exploring!
 
@@ -172,6 +132,46 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 <ul>
 <li>Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
 </ul>
+
+
+
+## 🍻 Inference
+### Inference on MeViS val and val_u splits.
+#### 1. Prepare data
+The dataset can be found in: https://github.com/henghuiding/MeViS  
+After you successfully download the dataset, the file structure of the dataset should be like this:
+* datasets
+    * MeViS/
+      * valid/
+        * JPEGImages/  
+        * meta_expressions.json
+      * valid_u/
+        * JPEGImages/
+        * mask_dict.json
+        * meta_expressions.json
+```
+pip install gdown
+gdown https://drive.google.com/drive/folders/1MACaQ-O8seyMj-MBlycxRgCT08RVBZJp --folder -O dataset/MeViS/
+```
+#### 2. Download DiT and tuned VAE checkpoints from  https://huggingface.co/xmz111/FlowRVS  and place them as mevis_dit.pth and tuned_vae.pth;
+#### 3.  Inference
+Just run:
+
+``` 
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ckpt=FlowRVS_dit_mevis.pth --vae_ckpt=tuned_vae.pth --output_dir=result --split=valid_u
+```
+   
+Note that this code will cost about 33G GPU memory with default setting.
+
+### Inference on any videos.
+```
+python inference_demo.py --input_path=video.mp4  --text_prompts "prompt_1" "prompt_2"    --fps=12 --save_fig --output_dir=result  --dit_ckpt=FlowRVS_dit_mevis.pth  --vae_ckpt=tuned_vae.pth
+```
+## 🥂 Training
+Use --dataset_file to select training dataset (mevis, pretrain, ytvos), and use --resume to load checkpoint.
+```
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=mevis --num_frames=17 --lr=5e-5 --output_dir=mevis_training 
+```
 
 ## 💚 Acknowledgement
 
