@@ -10,6 +10,7 @@
 ## 📢 News
 [2026.01.26] FlowRVS was accepted by ICLR 2026!  
 [2026.02.05] We updated training codes.
+[2026.02.13] We updated interesting demos.
 
 ## 🏄‍♂️ Overview
 
@@ -98,21 +99,22 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 
 ### 🎬 Demos
 We provide weights trained exclusively on the challenging MeViS dataset. Despite not seeing these domains during training, FlowRVS demonstrates remarkable zero-shot generalization across movies, sports, and internet memes. Have fun exploring!
+
 <table border="0" align="center">
   <tr>
     <td width="70%" align="center">
       <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350?raw=true" width="100%" controls="controls" muted="muted"></video>
     </td>
     <td width="30%" valign="top">
-      <h3>🦾🐱 Ultraman</h3>
-      <ul>
+       <h3 align="left">⚖️ 🦾 Ultraman</h3>
+       <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the Ultraman", "the devil cat"</li>
         <li><b>Note:</b> Handles complex dynamic interactions (combat) and severe environmental interference (heavy smoke/fog). Observe the fine-grained boundary adherence on the cat's fur and the Ultraman's silhouette despite the chaos.</li>
       </ul>
     </td>
   </tr>
-</table>>
+</table>
 
 <br/>
 
@@ -121,11 +123,11 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
     <td align="center" width="70%">
       <video src="https://github.com/user-attachments/assets/1d3bd1f3-ded9-4b50-8c43-689b2aac3e90" width="100%" controls="controls"></video>
     </td>
-    <td width="30%">
-      <h3>⛹️‍♂️🏀 Basketball Demo</h3>
-      <ul>
+    <td width="30%" valign="top">
+       <h3 align="left">⚖️ ⛹️‍♂️ Basketball</h3>
+       <ul>
         <li><b>FPS:</b> 12</li>
-        <li><b>Prompt:</b> "the man wearing colorful shoes shoots tha ball" "tha man who is defending" "bastekball"</li>
+        <li><b>Prompt:</b> "the man wearing colorful shoes shoots the ball", "the man who is defending", "basketball"</li>
         <li><b>Note:</b> Successfully tracks small, fast-moving objects (the basketball) and articulates complex human motion. It distinguishes the shooter from the defender even during rapid crossover movements.</li>
       </ul>
     </td>
@@ -139,8 +141,8 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
     <td align="center" width="70%">
       <video src="https://github.com/user-attachments/assets/480d39fb-e378-4733-be3e-a3a47e159875" width="100%" controls="controls"></video>
     </td>
-    <td width="30%">
-      <h3>⚖️ "Better Call Saul" Demo</h3>
+    <td width="30%" valign="top">
+      <h3 align="left">⚖️ Better Call Saul</h3>
       <ul>
         <li><b>FPS:</b> 8</li>
         <li><b>Prompt:</b> "angry man in the suit shouting at another man"</li>
@@ -152,7 +154,10 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 
 <br/>
 
-<h3 align="center">🐱 Cat Memes Segmentation</h3>
+<br/>
+<div align="center">
+  <h3>🐱 Cat Memes Segmentation</h3>
+</div>
 
 <div align="center">
   <table border="0">
