@@ -86,7 +86,10 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 inference_mevis.py --dit_ck
    
 Note that this code will cost about 33G GPU memory with default setting.
 
-
+### Inference on any videos.
+```
+python inference_demo.py --input_path=video.mp4  --text_prompts "prompt_1" "prompt_2"    --fps=12 --save_fig --output_dir=result  --dit_ckpt=FlowRVS_dit_mevis.pth  --vae_ckpt=tuned_vae.pth
+```
 ## 🥂 Training
 Use --dataset_file to select training dataset (mevis, pretrain, ytvos), and use --resume to load checkpoint.
 ```
