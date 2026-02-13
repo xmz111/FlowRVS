@@ -136,13 +136,10 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
       <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" width="100%" controls="controls"></video>
     </td>
     <td width="50%">
-      <h3>🦸‍♂️ Basketball Demo</h3>
-      <ul>
-        <li><b>FPS:</b> "the man wearing colorful shoes shoots tha ball" "tha man who is defending" "bastekball"</li>
-        <li><b>Prompt:</b> 12</li>
-        <li><b>Note:</b> FlowRVS can distinguish small objects like basketball.</li>
-      </ul>
+    <td align="center" width="50%">
+      <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" width="100%" controls="controls"></video>
     </td>
+    <td width="50%">
   </tr>
 </table>>
 
