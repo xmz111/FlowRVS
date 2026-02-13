@@ -130,18 +130,24 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
   </tr>
 </table>>
 
-<table align="center">
-  <tr>
-    <td align="center" width="50%">
-      <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" width="100%" controls="controls"></video>
-    </td>
-    <td width="50%">
-    <td align="center" width="50%">
-      <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" width="100%" controls="controls"></video>
-    </td>
-    <td width="50%">
-  </tr>
-</table>>
+<h3 align="center">🐱 Cat Demos</h3>
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <video src="[你的第一个视频链接.mp4](https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5)" height="300" controls></video>
+      </td>
+      <td align="center">
+        <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls></video>
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><b>Aggressive Cat</b></td>
+      <td align="center"><b>Dying Cat</b></td>
+    </tr>
+  </table>
+</div>
 
 ## 💚 Acknowledgement
 
