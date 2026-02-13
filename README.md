@@ -136,7 +136,7 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
   <table>
     <tr>
       <td align="center">
-        <video src="[你的第一个视频链接.mp4](https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5)" height="300" controls></video>
+        <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls></video>
       </td>
       <td align="center">
         <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls></video>
