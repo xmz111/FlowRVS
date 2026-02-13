@@ -66,7 +66,6 @@ def vis_add_mask_new(img, mask, color, alpha: float = 0.5):
         Image.Image: The image with the mask overlaid.
     """
     # Ensure mask is binary and has the correct shape for blending
-    color = (255, 0, 255)
     mask_np = np.asarray(mask).astype(np.uint8)
     if mask_np.ndim > 2:
         mask_np = mask_np.reshape(mask_np.shape[0], mask_np.shape[1])
