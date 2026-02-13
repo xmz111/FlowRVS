@@ -97,7 +97,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 ```
 
 ### 🎬 Demos
-
+We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
 <table align="center">
   <tr>
     <td align="center" width="50%">
@@ -107,8 +107,26 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
       <h3>🦸‍♂️ Ultraman Demo</h3>
       <ul>
         <li><b>Model:</b> FlowRVS-Large</li>
-        <li><b>FPS:</b> 24</li>
-        <li><b>Note:</b> Observe the edge consistency on the cat's fur.</li>
+        <li><b>FPS:</b> 12</li>
+        <li><b>Prompt:</b> 12</li>
+        <li><b>Note:</b> "the Ultraman" "the devil cat"</li>
+      </ul>
+    </td>
+  </tr>
+</table>>
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <video src="https://github.com/user-attachments/assets/1d3bd1f3-ded9-4b50-8c43-689b2aac3e90" width="100%" controls="controls"></video>
+    </td>
+    <td width="50%">
+      <h3>🦸‍♂️ Ultraman Demo</h3>
+      <ul>
+        <li><b>Model:</b> FlowRVS-Large</li>
+        <li><b>FPS:</b> 12</li>
+        <li><b>Prompt:</b> 12</li>
+        <li><b>Note:</b> "the Ultraman" "the devil cat"</li>
       </ul>
     </td>
   </tr>
