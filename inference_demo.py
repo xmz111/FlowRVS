@@ -25,6 +25,18 @@ from moviepy import ImageSequenceClip
 
 color_list = colormap().astype('uint8').tolist()
 
+def load_modeles(device):
+    target_dtype = torch.bfloat16
+    model_id = "Wan2.1-T2V-1.3B-Diffusers" 
+    vae = AutoencoderKLWan.from_pretrained(model_id, subfolder="vae", torch_dtype=target_dtype).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_id, subfolder="tokenizer")
+    text_encoder = UMT5EncoderModel.from_pretrained(model_id, subfolder="text_encoder", torch_dtype=target_dtype).to(device)
+    
+    scheduler = FlowMatchEulerDiscreteScheduler.from_config(model_id, subfolder="scheduler") 
+    vae.requires_grad_(False)
+    text_encoder.requires_grad_(False)
+    return vae.eval(), tokenizer, text_encoder.eval(), scheduler
+
 def extract_frames_from_mp4(video_path, output_folder):
 
     needs_extraction = True
@@ -46,55 +58,69 @@ def extract_frames_from_mp4(video_path, output_folder):
     return output_folder, frames_list, '.png'
 
 
-def prepare_models(args):
+def prepare():
     device = torch.device(args.device)
-
+    
+    # 1. Load DiT Model (Main Model)
     model = build_dit(args)
 
-    model_id = "Wan2.1-T2V-1.3B-Diffusers"
-    vae = AutoencoderKLWan.from_pretrained(model_id, subfolder="vae")
-    tokenizer = AutoTokenizer.from_pretrained(model_id, subfolder="tokenizer")
-    text_encoder = UMT5EncoderModel.from_pretrained(model_id, subfolder="text_encoder")
-    scheduler = FlowMatchEulerDiscreteScheduler.from_config(model_id, subfolder="scheduler")
-    text_processor = TextProcessor(tokenizer, text_encoder.to(device).eval())
+    # 2. Load VAE and Text Encoder (Auxiliary Models)
+    vae, tokenizer, text_encoder, scheduler = load_modeles(device)
+    text_processor = TextProcessor(tokenizer, text_encoder)
+    
+    for param in vae.parameters(): 
+        param.requires_grad = False # Freeze VAE
+    
+    text_encoder.to(device).eval()
+    for param in text_encoder.parameters():
+        param.requires_grad = False # Freeze Text Encoder
+
     model_id = "Wan2.1-T2V-1.3B-Diffusers" 
+        
+    mask_vae = MaskVAEFinetuner(vae_model_id=model_id, target_dtype=torch.bfloat16)
     
-    mask_head = MaskVAEFinetuner(
-        args=args,
-        vae_model_id=model_id,
-        target_dtype=vae.dtype, 
-    )
+    print(f"[Loading checkpoint from {args.vae_ckpt}]")
+    vae_checkpoint = torch.load(args.vae_ckpt, map_location='cpu', weights_only=False)
+    vae_state_dict = vae_checkpoint.get('model', vae_checkpoint)
+    missing_keys, unexpected_keys = mask_vae.load_state_dict(vae_state_dict, strict=True)
+    unexpected_keys = [k for k in unexpected_keys if not (k.endswith('total_params') or k.endswith('total_ops'))]
+    if len(missing_keys) > 0:
+        print(f'Missing Keys: {missing_keys}')
+    if len(unexpected_keys) > 0:
+        print(f'Unexpected Keys: {unexpected_keys}')
+    del vae_checkpoint
 
-    ckpt_path = 'decoder_8_13/checkpoint0002.pth'
-    checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
-    if 'model' in checkpoint:
-        missing_keys, unexpected_keys = mask_head.load_state_dict(checkpoint['model'], strict=False)
+    # now vae is same as WAN VAE, but use tuned weight
+    vae = mask_vae.vae.to(device).eval() 
 
-    vae.decoder = mask_head.vae.decoder
-    
-    vae.to(device).eval() 
-    
-    if args.resume:
-        print(f"[Loading checkpoint from {args.resume}")
-        checkpoint = torch.load(args.resume, map_location='cpu', weights_only=False)
-        model_state_dict = checkpoint.get('model', checkpoint) 
-
-        missing_keys, unexpected_keys = model.load_state_dict(model_state_dict, strict=False)
-
-        unexpected_keys = [k for k in unexpected_keys if not (k.endswith('total_params') or k.endswith('total_ops'))]
-        if len(missing_keys) > 0:
-            print(f'Missing Keys: {missing_keys}')
-        if len(unexpected_keys) > 0:
-            print(f'Unexpected Keys: {unexpected_keys}')
-        del checkpoint
+    model_without_ddp = model 
+    if args.dit_ckpt:
+        print(f"[Loading checkpoint from {args.dit_ckpt}")
+        checkpoint = torch.load(args.dit_ckpt, map_location='cpu', weights_only=False)
+        
+        if 'model' in checkpoint:
+            print("[Info] Loading base model weights (to restore buffers)...")
+            model_without_ddp.load_state_dict(checkpoint['model'], strict=False)
+        
+        if 'ema_model' in checkpoint:
+            print("[Info] Found 'ema_model'. Applying EMA weights...")
+            ema_helper = EMAModel(
+                model_without_ddp.parameters(),
+                decay=0.9999,
+                model_cls=type(model_without_ddp),
+                model_config=model_without_ddp.config
+            )
+            ema_helper.load_state_dict(checkpoint['ema_model'])
+            ema_helper.copy_to(model_without_ddp.parameters())
+            print("[Info] EMA weights applied successfully.")
+            del ema_helper
+            torch.cuda.empty_cache()
+        else:
+            print("[Warning] No EMA found in checkpoint, using standard weights.")
     else:
         raise ValueError('Please specify the checkpoint for inference using --resume.')
     
-    model.to(device).to(torch.bfloat16).eval() 
-    vae.to(torch.bfloat16)
-    text_processor.text_encoder.to(torch.bfloat16)
-
-    return model, vae, text_processor, scheduler
+    return model_without_ddp, vae, text_processor, scheduler
 
 
 def inference_single_video(args, model, vae, text_processor, scheduler, video_path, text_prompts):
@@ -113,13 +139,13 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
             frames_list = sorted([os.path.splitext(f)[0] for f in image_files])
             frame_ext = os.path.splitext(image_files[0])[1]
     else:
-        raise ValueError(f"Path is not rigjt: {video_path}")
+        raise ValueError(f"Path is not right: {video_path}")
  
     device, dtype = vae.device, vae.dtype
     mean_tensor = torch.tensor(vae.config.latents_mean, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
     std_tensor = torch.tensor(vae.config.latents_std, device=device, dtype=dtype).view(1, -1, 1, 1, 1)
 
-    target_h, target_w = (480, 832)
+    target_h, target_w = args.reso_h, args.reso_w
     vd = VideoEvalDataset(frames_folder, frames_list, frame_ext, target_h=target_h, target_w=target_w)
     dl = DataLoader(vd, batch_size=len(frames_list), num_workers=args.num_workers, shuffle=False)
     origin_w, origin_h = vd.origin_w, vd.origin_h
@@ -135,6 +161,8 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
         imgs = torch.cat([imgs, padding_frames], dim=0)
     
     imgs = imgs.unsqueeze(0)
+
+    mask_results = [] 
     
     with torch.no_grad():
         imgs = check_shape(imgs)
@@ -143,7 +171,7 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
 
         for i, prompt in enumerate(tqdm(text_prompts, desc=f"Processing prompts for {fname}")):
             prompt_embeds, _ = text_processor.encode_prompt_and_cfg(
-                prompt=[prompt], device=device, dtype=dtype, do_classifier_free_guidance=args.cfg
+                prompt=[prompt], device=device, dtype=dtype
             )
 
             shift = 3
@@ -153,7 +181,7 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
             timesteps = scheduler.timesteps
 
             latents = x0_video_latent.clone()
-            for t in tqdm(timesteps, leave=False, desc="Diffusion steps"):
+            for t in tqdm(timesteps, leave=False, desc=f"Diffusion ({prompt})"):
                 timestep = t.expand(latents.shape[0])
                 noise_pred = model(
                     hidden_states=latents.to(model.dtype),
@@ -163,46 +191,59 @@ def inference_single_video(args, model, vae, text_processor, scheduler, video_pa
                 )[0]
                 latents = scheduler.step(noise_pred, t, latents)[0]
 
-            #latents = latents * std_tensor_mask + mean_tensor_mask
             decoded_pixel_output = vae.decode(latents.detach())[0]
             decoded_pixel_output = F.interpolate(decoded_pixel_output.view(-1, 1, decoded_pixel_output.shape[-2], decoded_pixel_output.shape[-1]),
-                                size=(origin_h, origin_w), mode='bilinear', align_corners=False) 
+                                            size=(origin_h, origin_w), mode='bilinear', align_corners=False) 
             reconstructed_mask_probs = torch.sigmoid(decoded_pixel_output)
             all_pred_masks = (reconstructed_mask_probs > 0.5).float().cpu().squeeze(0).squeeze(1)
             all_pred_masks = all_pred_masks[:original_len].numpy() 
+
+            current_color = color_list[i % len(color_list)]
             
-            prompt_sanitized = "".join(c if c.isalnum() else "_" for c in prompt)
-            
-            clip_source_list = []
-            
-            if args.save_fig:
-                save_visualize_path_dir = os.path.join(args.output_dir, fname, prompt_sanitized)
-                os.makedirs(save_visualize_path_dir, exist_ok=True)
-                print(f"Saving frame visualizations to: {save_visualize_path_dir}")
+            mask_results.append({
+                "prompt": prompt,
+                "masks": all_pred_masks,
+                "color": current_color
+            })
 
-            for frame_idx, frame_name in enumerate(frames_list):
-                img_path = os.path.join(frames_folder, frame_name + frame_ext)
-                source_img = Image.open(img_path).convert('RGBA')
-                source_img = vis_add_mask_new(source_img, all_pred_masks[frame_idx], color_list[i % len(color_list)])
-                
-                if args.save_fig:
-                    save_path = os.path.join(save_visualize_path_dir, f"{frame_name}.png")
-                    source_img.save(save_path)
-                    clip_source_list.append(save_path)
-                else:
-                    frame_as_array = np.array(source_img)
-                    clip_source_list.append(frame_as_array)
+    combined_name = "_".join(["".join(c for c in p if c.isalnum())[:5] for p in text_prompts])
+    if len(combined_name) > 30: combined_name = combined_name[:30]
 
-            if clip_source_list:
-                video_output_path = os.path.join(args.output_dir, f"{prompt_sanitized}_output.mp4")
-                os.makedirs(os.path.dirname(video_output_path), exist_ok=True)
+    save_visualize_path_dir = os.path.join(args.output_dir, fname)
+    
+    if args.save_fig:
+        os.makedirs(save_visualize_path_dir, exist_ok=True)
+        print(f"Saving combined visualizations to: {save_visualize_path_dir}")
 
-                fps = args.fps 
-                clip = ImageSequenceClip(clip_source_list, fps=fps)
-                clip.write_videofile(video_output_path, codec='libx264', logger=None)
+    clip_source_list = []
 
-                print(f"Video saved to: {video_output_path}")
+    print(f"Overlaying {len(mask_results)} masks onto frames...")
+    for frame_idx, frame_name in enumerate(frames_list):
+        img_path = os.path.join(frames_folder, frame_name + frame_ext)
+        source_img = Image.open(img_path).convert('RGBA')
 
+        for item in mask_results:
+            mask = item['masks'][frame_idx]
+            color = item['color']
+            source_img = vis_add_mask_new(source_img, mask, color, alpha=0.5)
+        
+        if args.save_fig:
+            save_path = os.path.join(save_visualize_path_dir, f"{frame_name}.png")
+            source_img.save(save_path)
+            clip_source_list.append(save_path)
+        else:
+            frame_as_array = np.array(source_img)
+            clip_source_list.append(frame_as_array)
+
+    if clip_source_list:
+        video_output_path = os.path.join(args.output_dir, f"{fname}_result.mp4")
+        os.makedirs(os.path.dirname(video_output_path), exist_ok=True)
+
+        fps = args.fps 
+        clip = ImageSequenceClip(clip_source_list, fps=fps)
+        clip.write_videofile(video_output_path, codec='libx264', logger=None)
+
+        print(f"Combined video saved to: {video_output_path}")
 
 def main(args):
     utils.init_distributed_mode(args)
@@ -214,8 +255,8 @@ def main(args):
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     start_time = time.time()
 
-    model, vae, text_processor, scheduler = prepare_models(args)
-
+    model, vae, text_processor, scheduler = prepare()
+    model = model.to(dtype=torch.bfloat16).eval()
     inference_single_video(args, model, vae, text_processor, scheduler, args.input_path, args.text_prompts)
 
     total_time = time.time() - start_time
@@ -226,9 +267,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('Inference Script', parents=[opts.get_args_parser()])
     parser.add_argument('--input_path', type=str, required=True, help='video .mp4 path')
     parser.add_argument('--text_prompts', type=str, required=True, nargs='+', help='text')
-    parser.add_argument('--num_steps', default=4, type=int, help='Inference steps')
+    parser.add_argument('--dit_ckpt', default=None, type=str, help="DiT checkpoint")
+    parser.add_argument('--vae_ckpt', default=None, type=str, help="VAE checkpoint for tuned decoder")
+    parser.add_argument('--num_steps', default=1, type=int, help='Inference steps')
+    parser.add_argument('--reso_h', default=480, type=int, help="VAE checkpoint for tuned decoder")
+    parser.add_argument('--reso_w', default=832, type=int, help="VAE checkpoint for tuned decoder")
     parser.add_argument('--fps', default=24, type=int, help='Video FPS')
-    parser.add_argument('--cfg', action='store_true', help='cfg')
     parser.add_argument('--save_fig', default=False, action='store_true',
                         help='Save figures')
     args = parser.parse_args()
