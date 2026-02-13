@@ -154,30 +154,27 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 
 <br/>
 
-<br/>
-<div align="center">
-  <h3>🐱 Cat Memes Segmentation</h3>
-</div>
+<h3 align="center">🐱 Cat Memes Segmentation</h3>
 
 <div align="center">
-  <table border="0">
-    <tr>
-      <td align="center">
-         <video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls="controls" muted="muted"></video>
-      </td>
-      <td align="center">
-         <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls="controls" muted="muted"></video>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" align="left">
-         <ul>
-           <li><b>FPS:</b> 10 </li>
-           <li><b>Note:</b> Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
-         </ul>
-      </td>
-    </tr>
-  </table>
+<table border="0">
+<tr>
+<td align="center">
+<video src="https://github.com/user-attachments/assets/ec3a6d98-b874-4e1a-acee-ab4b3516daa5" height="300" controls="controls" muted="muted"></video>
+</td>
+<td align="center">
+<video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls="controls" muted="muted"></video>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="left">
+<ul>
+<li><b>FPS:</b> 10 </li>
+<li><b>Note:</b> Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
+</ul>
+</td>
+</tr>
+</table>
 </div>
 
 ## 💚 Acknowledgement
