@@ -166,16 +166,12 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 <video src="https://github.com/user-attachments/assets/5a8ec3e0-e78e-41ac-9587-8d55d5f6c238" height="300" controls="controls" muted="muted"></video>
 </td>
 </tr>
-<tr>
-<td colspan="2" align="left">
-<ul>
-<li><b>FPS:</b> 10 </li>
-<li><b>Note:</b> Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
-</ul>
-</td>
-</tr>
 </table>
 </div>
+
+<ul>
+<li>Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
+</ul>
 
 ## 💚 Acknowledgement
 
