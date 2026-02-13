@@ -100,7 +100,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 
 | **Ultraman vs. Cat** | **Better Call Saul** |
 | :---: | :---: |
-| !["Ultraman"](assets/automan_result.gif) | !["Saul"](assets/saul_result.gif) |
+| !["Ultraman"](assets/automan_result.mp4) | !["Saul"](assets/saul_result.mp4) |
 
 | **Basketball** | **Cat Demos** |
 | :---: | :---: |
