@@ -97,18 +97,18 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=me
 ```
 
 ### 🎬 Demos
-We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
+We provide weights trained exclusively on the challenging MeViS dataset. Despite not seeing these domains during training, FlowRVS demonstrates remarkable zero-shot generalization across movies, sports, and internet memes. Have fun exploring!
 <table border="0" align="center">
   <tr>
     <td width="70%" align="center">
-      <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350#.mp4" width="100%" controls="controls" muted="muted"></video>
+      <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350?raw=true" width="100%" controls="controls" muted="muted"></video>
     </td>
     <td width="30%" valign="top">
       <h3>🦾🐱 Ultraman</h3>
       <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the Ultraman", "the devil cat"</li>
-        <li><b>Note:</b> FlowRVS can segment objects effectively even in smoke/fog.</li>
+        <li><b>Note:</b> Handles complex dynamic interactions (combat) and severe environmental interference (heavy smoke/fog). Observe the fine-grained boundary adherence on the cat's fur and the Ultraman's silhouette despite the chaos.</li>
       </ul>
     </td>
   </tr>
@@ -126,7 +126,7 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
       <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the man wearing colorful shoes shoots tha ball" "tha man who is defending" "bastekball"</li>
-        <li><b>Note:</b> FlowRVS can distinguish small objects like basketball.</li>
+        <li><b>Note:</b> Successfully tracks small, fast-moving objects (the basketball) and articulates complex human motion. It distinguishes the shooter from the defender even during rapid crossover movements.</li>
       </ul>
     </td>
   </tr>
@@ -144,7 +144,7 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
       <ul>
         <li><b>FPS:</b> 8</li>
         <li><b>Prompt:</b> "angry man in the suit shouting at another man"</li>
-        <li><b>Note:</b> FlowRVS can long term setting.</li>
+        <li><b>Note:</b> Demonstrates robust long-term temporal consistency. The model maintains identity and accurate segmentation over extended sequences, resisting drift even as the camera zooms and subjects interact.</li>
       </ul>
     </td>
   </tr>
@@ -167,8 +167,8 @@ We use the weight only trained on MeViS to inference. Have fun with FlowRVS!
     <tr>
       <td colspan="2" align="left">
          <ul>
-           <li><b>FPS:</b> 9 (Real-time)</li>
-           <li><b>Note:</b> These demos showcase robust segmentation on challenging internet memes. The model successfully handles rapid, blurry motion (left) and significant body deformations (right).</li>
+           <li><b>FPS:</b> 10 </li>
+           <li><b>Note:</b> Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
          </ul>
       </td>
     </tr>
