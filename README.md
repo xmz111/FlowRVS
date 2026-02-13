@@ -95,6 +95,17 @@ Use --dataset_file to select training dataset (mevis, pretrain, ytvos), and use 
 ```
 CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2  main.py  --dataset_file=mevis --num_frames=17 --lr=5e-5 --output_dir=mevis_training 
 ```
+
+### 🎬 Demos
+
+| **Ultraman vs. Cat** | **Better Call Saul** |
+| :---: | :---: |
+| !["Ultraman"](assets/automan_result.gif) | !["Saul"](assets/saul_result.gif) |
+
+| **Basketball** | **Cat Demos** |
+| :---: | :---: |
+| !["Basketball"](assets/jams_curry_result.gif) | !["Cat"](assets/the_aggressive_cat_output.gif) |
+
 ## 💚 Acknowledgement
 
 We referenced the following works, and appreciate their contributions to the community.
