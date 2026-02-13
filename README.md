@@ -106,7 +106,7 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
       <video src="https://github.com/user-attachments/assets/0cfd289c-e3a0-4a6d-b979-c6023cb78350?raw=true" width="100%" controls="controls" muted="muted"></video>
     </td>
     <td width="30%" valign="top">
-       <h3 align="left">⚖️ 🦾 Ultraman</h3>
+       <h3 align="left">🦾 Ultraman</h3>
        <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the Ultraman", "the devil cat"</li>
@@ -124,7 +124,7 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
       <video src="https://github.com/user-attachments/assets/1d3bd1f3-ded9-4b50-8c43-689b2aac3e90" width="100%" controls="controls"></video>
     </td>
     <td width="30%" valign="top">
-       <h3 align="left">⚖️ ⛹️‍♂️ Basketball</h3>
+       <h3 align="left">🏀⛹️‍♂️ Basketball</h3>
        <ul>
         <li><b>FPS:</b> 12</li>
         <li><b>Prompt:</b> "the man wearing colorful shoes shoots the ball", "the man who is defending", "basketball"</li>
