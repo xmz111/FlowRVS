@@ -1,18 +1,19 @@
-<div align=“center” style=“font-family: charter;”>
-<h1 align="center"> Deforming Videos to Masks: Flow Matching for Referring Video Segmentation </h1>
-
-<p align="center">
-  <a href='https://arxiv.org/abs/2510.06139'>
-    <img src="https://img.shields.io/badge/arXiv%20paper-2510.06139-b31b1b.svg" alt="Paper">
-  </a>
-</p>
+<h1 align="center">Deforming Videos to Masks: Flow Matching for Referring Video Segmentation</h1>
+<div align="center">
+  <a href='https://arxiv.org/abs/2510.06139'><img src='https://img.shields.io/badge/Paper-red?logo=arxiv'></a>  &nbsp;
+  <a href="https://github.com/xmz111/FlowRVS"><img src="https://img.shields.io/badge/Code-9E95B7?logo=github"></a> &nbsp;
+    <a href='https://huggingface.co/xmz111/FlowRVS'><img src='https://img.shields.io/badge/Model_Weight-blue?logo=huggingface'></a> &nbsp;
+  
+</div>
 
 ## 📢 News
 [2026.02.13] 🎨🎨 We updated interesting demos.
 
-[2026.02.05] 🔥🔥 We updated training codes. 
+[2026.02.05] 🔥🔥 We updated training code. 
 
 [2026.01.26] 🎉🎉FlowRVS was accepted by ICLR 2026!  
+
+[2025.12.01] 🔥🔥 We updated model weight and inference code.
 
 ## 🏄‍♂️ Overview
 
@@ -110,11 +111,6 @@ We provide weights trained exclusively on the challenging MeViS dataset. Despite
 <li>Robustness against severe occlusions (shelf, paper roll, sausage) and significant non-rigid body deformation. The model tracks the target continuously even when partially hidden or undergoing extreme pose changes.</li>
 </ul>
 
-
-## 🕒 Open-Source Plan
- - [x] Model and Inference Code
- - [x] Model Weight and Inference Guidance 
- - [x] Training Code and Guidance
 
 ## 🛠️ Environment Setup
 
