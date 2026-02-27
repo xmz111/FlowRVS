@@ -93,7 +93,7 @@ class TextProcessor:
         prompt: Union[str, List[str]],
         device: Optional[torch.device] = None,
         dtype: Optional[torch.dtype] = None,
-        max_sequence_length: int = 64,
+        max_sequence_length: int = 256,
         negative_prompt: Optional[Union[str, List[str]]] = None,
         do_classifier_free_guidance: bool = False,
         num_videos_per_prompt: int = 1, 
