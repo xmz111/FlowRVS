@@ -3,6 +3,7 @@
   <a href='https://arxiv.org/abs/2510.06139'><img src='https://img.shields.io/badge/Paper-red?logo=arxiv'></a>  &nbsp;
   <a href="https://github.com/xmz111/FlowRVS"><img src="https://img.shields.io/badge/Code-9E95B7?logo=github"></a> &nbsp;
     <a href='https://huggingface.co/xmz111/FlowRVS'><img src='https://img.shields.io/badge/Model_Weight-blue?logo=huggingface'></a> &nbsp;
+    <a href='https://mp.weixin.qq.com/s/q00A7IB3wd_FzdLv49ad1w'><img src='https://img.shields.io/badge/机器之心-Article-07C160?logo=wechat&logoColor=white'></a> &nbsp;
   
 </div>
 
